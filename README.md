@@ -1,11 +1,12 @@
-# Web Template
+# Fitbit Website
 
-This can be used for quickly setting up a web project using the Yarn package manager, React, ES6, and Babel. First, you'll need to make sure Yarn is installed. If you already have npm installed, you can just run
+A website for creating Fitbit step competitions with your friends.
 
-`npm install --global yarn`
+To install:
+`yarn install`
 
-to get Yarn. Then you can simply run `yarn` in the root of the project to install the dependencies. Lastly, since we have Webpack as a dependency we can start the server with
+To run:
+`yarn run dev`
 
-`./node_modules/.bin/webpack-dev-server --progress --colors`
-
-and head to `localhost:8080` to see the site.
+To view:
+Go to `localhost:8080`
