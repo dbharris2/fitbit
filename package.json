@@ -1,14 +1,17 @@
 {
   "name": "fitbit",
   "version": "1.0.0",
-  "main": "index.js",
   "author": "Devon Harris",
   "license": "MIT",
-  "scripts": { 
+  "scripts": {
     "dev": "webpack-dev-server --progress --colors",
-    "postinstall": "webpack -p"
+    "postinstall": "webpack -p",
+    "watch": "webpack --watch"
   },
   "dependencies": {
+    "express": "^4.15.0",
+    "install": "^0.8.7",
+    "npm": "^4.3.0",
     "react": "0.14.7",
     "react-dom": "0.14.7",
     "webpack-dev-server": "1.12.1"
