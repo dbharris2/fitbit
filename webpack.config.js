@@ -2,10 +2,12 @@ var path = require('path');
 var webpack = require('webpack');
 
 var BUILD_DIR = path.resolve(__dirname, 'public/bin');
-var JSX_DIR = path.resolve(__dirname, 'public/jsx');
+var JSX_DIR = path.resolve(__dirname, 'jsx');
 var APP_ENTRY = JSX_DIR + '/main.jsx';
+var NODE_MODULES_DIR = path.resolve(__dirname, './node_modules');
 
 var config = {
+  devtool: 'eval',
   entry: {
     app: APP_ENTRY,
   },
@@ -16,13 +18,10 @@ var config = {
   module: {
     loaders: [
       {
-        test: /.jsx?$/,
+        test: /\.jsx?$/,
         loader: 'babel-loader',
-        include: JSX_DIR,
-        query: {
-          presets: ['es2015', 'react']
-        }
-      }
+        exclude: [NODE_MODULES_DIR]
+      },
     ]
   },
   resolve: {
