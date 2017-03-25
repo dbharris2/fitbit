@@ -1,9 +1,10 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import Hello from './hello'
+
+import FitbitContainer from './fitbit_container'
 
 ReactDOM.render(
-  <Hello />,
+  <FitbitContainer />,
   document.getElementById('content')
-);
+)
