@@ -2,7 +2,7 @@ import express from 'express'
 import fs from 'fs'
 import path from 'path'
 
-const FitbitApiClient = require('fitbit-node')
+import FitbitClient from './jsx/client'
 
 const ACCESS_TOKEN_FILE = path.join(__dirname, 'json/access_token.json')
 const APP_FILE = path.join(__dirname, 'json/app.json')
@@ -23,35 +23,35 @@ app.get('/', (req, res) => {
 })
 
 app.get('/authenticate', (req, res) => {
-  createFitbitApiClient(function(fitbitApiClient) {
-    const authorizeUrl = fitbitApiClient.getAuthorizeUrl(
+  createFitbitClient((fitbitClient) => {
+    const authorizeUrl = fitbitClient.getAuthorizeUrl(
       'activity heartrate location nutrition profile settings sleep social',
-      FITBIT_AUTHORIZATION_CALLBACK_URL
+      FITBIT_AUTHORIZATION_CALLBACK_URL,
     )
     res.redirect(authorizeUrl)
   })
 })
 
 app.get('/fitbit-callback', (req, res) => {
-  createFitbitApiClient((fitbitApiClient) => {
-    fitbitApiClient.getAccessToken(req.query.code, FITBIT_AUTHORIZATION_CALLBACK_URL).then(function(result) {
-      // TODO: Store the access token and redirect to a valid url
-      console.log(JSON.stringify(result))
-      console.log('Access token: ' + result.access_token)
-      res.redirect('/')
-    }).catch(function(error) {
-      res.send(error)
-    })
+  createFitbitClient((fitbitClient) => {
+    fitbitClient.getAccessToken(
+      req.query.code,
+      FITBIT_AUTHORIZATION_CALLBACK_URL,
+      (result) => {
+        // TODO: Store the access token and redirect to a valid url
+        console.log(JSON.stringify(result))
+        console.log('Access token: ' + result.access_token)
+        res.redirect('/')
+      },
+      (error) => { res.send(error) })
   })
 })
 
 app.get('/profile', (req, res) => {
-  createFitbitApiClient((fitbitApiClient) => {
-    fetchJson(ACCESS_TOKEN_FILE, (jsonData) => {
-      fitbitApiClient.get('/profile.json', jsonData.access_token).then(function(results) {
-        const data = results[0]
-        res.json(data)
-      })
+  createFitbitClient((fitbitClient) => {
+    fitbitClient.getProfile((results) => {
+      const data = results[0]
+      res.json(data)
     })
   })
 })
@@ -60,10 +60,17 @@ app.listen(app.get('port'), () => {
   console.log('Server started: http://localhost:' + app.get('port') + '/')
 })
 
-function createFitbitApiClient(onCreate) {
-  fetchJson(APP_FILE, function(appData) {
-    const client = new FitbitApiClient(appData.client_id, appData.client_secret)
-    onCreate(client)
+function createFitbitClient(onCreate) {
+  fetchJson(APP_FILE, (appData) => {
+    fetchJson(ACCESS_TOKEN_FILE, (jsonData) => {
+      const client = new FitbitClient(
+        appData.client_id,
+        appData.client_secret,
+        jsonData.access_token,
+        jsonData.user_id,
+      )
+      onCreate(client)
+    })
   })
 }
 

@@ -9,8 +9,18 @@ export default class Client {
 
   constructor(clientId, clientSecret, accessToken, userId) {
     this.accessToken = accessToken;
-    this.client = new FitbitApiClient(appData.clientId, appData.clientSecret);
+    this.client = new FitbitApiClient(clientId, clientSecret);
     this.userId = userId;
+  }
+
+  /**
+   * See {@link https://dev.fitbit.com/docs/oauth2/#access-token-request Fitbit Access Token Request}
+   * for more information
+   */
+  getAccessToken(code, callbackUrl, onResult, onError) {
+    this.client.getAccessToken(code, callbackUrl)
+      .then((result) => { onResult(result) })
+      .catch((error) => { onError(error) })
   }
 
   /**
@@ -20,7 +30,7 @@ export default class Client {
   getActivity(date, onResult) {
     this.client
       .get('/activities/date/' + date + '.json', this.accessToken, this.userId)
-      .then(onResult);
+      .then((result) => { onResult(result) })
   }
 
   /**
@@ -31,7 +41,8 @@ export default class Client {
     this.client.get(
       '/' + resourcePath + '/date/' + baseDate + '/' + endDate + '.json',
       this.accessToken,
-      this.userId).then(onResult);
+      this.userId,
+    ).then((result) => { onResult(result) })
   }
 
   /**
@@ -41,15 +52,15 @@ export default class Client {
   getAuthorizeUrl(callbackUrl) {
     this.client.getAuthorizeUrl(
       'activity heartrate location profile settings sleep social',
-      callbackUrl);
+      callbackUrl)
   }
 
   /**
    * See {@link https://dev.fitbit.com/docs/user/#get-profile Fitbit Profile Documentation}
    * for more information
    */
-  getProfile(url, onResult) {
+  getProfile(onResult) {
     this.client.get('/profile.json', this.accessToken, this.userId)
-      .then(onResult);
+      .then((response) => { onResult(response) })
   }
 }
