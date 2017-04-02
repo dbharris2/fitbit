@@ -16,8 +16,6 @@ app.use('/', express.static(path.join(__dirname, 'public')))
 createJsonEndpoints(app, '/access-token', ACCESS_TOKEN_FILE)
 createJsonEndpoints(app, '/app', APP_FILE)
 
-var client
-
 app.get('/', (req, res) => {
   res.sendFile(path.resolve(__dirname + './public/index.html'))
 })
