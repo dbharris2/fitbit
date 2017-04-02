@@ -10,7 +10,7 @@ export default class FitbitContainer extends React.Component {
     accessToken: string,
     clientId: string,
     clientSecret: string,
-    user: string,
+    user: ?Object,
   }
 
   constructor(props: FitbitContainerProps): void {
@@ -19,7 +19,7 @@ export default class FitbitContainer extends React.Component {
       accessToken: '',
       clientId: '',
       clientSecret: '',
-      userId: '',
+      user: null,
     }
   }
 
@@ -30,16 +30,17 @@ export default class FitbitContainer extends React.Component {
         clientId: app.client_id,
         clientSecret: app.client_secret,
       })
-
-      const client = new Fitbit(clientId, clientSecret);
-
     })
 
     axios.get('/access-token').then((accessTokenResponse) => {
-      const accessTokenObj = accessTokenResponse.data
       this.setState({
-        accessToken: accessTokenObj.access_token,
-        userId: accessTokenObj.user_id,
+        accessToken: accessTokenResponse.data.access_token,
+      })
+    })
+
+    axios.get('/profile').then((profile) => {
+      this.setState({
+        user: profile.data.user,
       })
     })
   }
@@ -48,10 +49,9 @@ export default class FitbitContainer extends React.Component {
     return (
       <div>
         <h1>2017 Fitbit Competition</h1>
-        <p>Access Token: {this.state.accessToken}</p>
-        <p>Client ID: {this.state.clientId}</p>
-        <p>Client Secret: {this.state.clientSecret}</p>
-        <p>User ID: {this.state.userId}</p>
+        <img src={this.state.user == null ? "" : this.state.user.avatar} />
+        <p>Name: {this.state.user == null ? "" : this.state.user.displayName}</p>
+        <p>Fitbit Member Since: {this.state.user == null ? "" : this.state.user.memberSince}</p>
       </div>
     )
   }
