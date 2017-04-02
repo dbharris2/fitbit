@@ -9,6 +9,7 @@ export default class FitbitContainer extends React.Component {
   state: {
     accessToken: string,
     activity: ?Object,
+    activityTimeSeries: ?Object,
     clientId: string,
     clientSecret: string,
     user: ?Object,
@@ -19,6 +20,7 @@ export default class FitbitContainer extends React.Component {
     this.state = {
       accessToken: '',
       activity: null,
+      activityTimeSeries: null,
       clientId: '',
       clientSecret: '',
       user: null,
@@ -29,6 +31,12 @@ export default class FitbitContainer extends React.Component {
     axios.get('/activity').then((response) => {
       this.setState({
         activity: response.data,
+      })
+    })
+
+    axios.get('/activity-time-series').then((response) => {
+      this.setState({
+        activityTimeSeries: response.data["activities-steps"],
       })
     })
 
@@ -43,11 +51,26 @@ export default class FitbitContainer extends React.Component {
     return (
       <div>
         <h1>2017 Fitbit Competition</h1>
+
+        <h3>Profile Info</h3>
         <img src={this.state.user == null ? "" : this.state.user.avatar} />
         <p>Name: {this.state.user == null ? "" : this.state.user.displayName}</p>
         <p>Fitbit Member Since: {this.state.user == null ? "" : this.state.user.memberSince}</p>
+
+        <h3>Activity Info</h3>
         <p>Steps on 2016-05-10: {this.state.activity == null ? "" : this.state.activity.summary.steps}</p>
         <p>Floors on 2016-05-10: {this.state.activity == null ? "" : this.state.activity.summary.floors}</p>
+
+        <h3>Activity Time Series Info</h3>
+        {
+          this.state.activityTimeSeries == null ? "" : this.state.activityTimeSeries.map((activityTimeSeries) => {
+            return (
+              <div key={activityTimeSeries.dateTime}>
+                <p>Steps on {activityTimeSeries.dateTime}: {activityTimeSeries.value}</p>
+              </div>
+            )
+          })
+        }
       </div>
     )
   }

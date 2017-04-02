@@ -30,6 +30,17 @@ app.get('/activity', (req, res) => {
   })
 })
 
+// TODO: Make the dates configurable. Probably want a post request for that.
+app.get('/activity-time-series', (req, res) => {
+  createFitbitClient((fitbitClient) => {
+    fitbitClient.getActivityTimeSeries('activities/steps', '2016-05-10', '2016-05-17', (results) => {
+      console.log(results)
+      const data = results[0]
+      res.json(data)
+    })
+  })
+})
+
 app.get('/authenticate', (req, res) => {
   createFitbitClient((fitbitClient) => {
     const authorizeUrl = fitbitClient.getAuthorizeUrl(
