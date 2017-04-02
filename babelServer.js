@@ -20,6 +20,16 @@ app.get('/', (req, res) => {
   res.sendFile(path.resolve(__dirname + './public/index.html'))
 })
 
+// TODO: Make the date configurable. Probably want a post request for that.
+app.get('/activity', (req, res) => {
+  createFitbitClient((fitbitClient) => {
+    fitbitClient.getActivity('2016-05-10', (results) => {
+      const data = results[0]
+      res.json(data)
+    })
+  })
+})
+
 app.get('/authenticate', (req, res) => {
   createFitbitClient((fitbitClient) => {
     const authorizeUrl = fitbitClient.getAuthorizeUrl(

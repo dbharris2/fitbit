@@ -8,6 +8,7 @@ export default class FitbitContainer extends React.Component {
 
   state: {
     accessToken: string,
+    activity: ?Object,
     clientId: string,
     clientSecret: string,
     user: ?Object,
@@ -17,6 +18,7 @@ export default class FitbitContainer extends React.Component {
     super(props);
     this.state = {
       accessToken: '',
+      activity: null,
       clientId: '',
       clientSecret: '',
       user: null,
@@ -24,23 +26,15 @@ export default class FitbitContainer extends React.Component {
   }
 
   componentDidMount(): void {
-    axios.get('/app').then((appResponse) => {
-      const app = appResponse.data;
+    axios.get('/activity').then((response) => {
       this.setState({
-        clientId: app.client_id,
-        clientSecret: app.client_secret,
+        activity: response.data,
       })
     })
 
-    axios.get('/access-token').then((accessTokenResponse) => {
+    axios.get('/profile').then((response) => {
       this.setState({
-        accessToken: accessTokenResponse.data.access_token,
-      })
-    })
-
-    axios.get('/profile').then((profile) => {
-      this.setState({
-        user: profile.data.user,
+        user: response.data.user,
       })
     })
   }
@@ -52,6 +46,8 @@ export default class FitbitContainer extends React.Component {
         <img src={this.state.user == null ? "" : this.state.user.avatar} />
         <p>Name: {this.state.user == null ? "" : this.state.user.displayName}</p>
         <p>Fitbit Member Since: {this.state.user == null ? "" : this.state.user.memberSince}</p>
+        <p>Steps on 2016-05-10: {this.state.activity == null ? "" : this.state.activity.summary.steps}</p>
+        <p>Floors on 2016-05-10: {this.state.activity == null ? "" : this.state.activity.summary.floors}</p>
       </div>
     )
   }
