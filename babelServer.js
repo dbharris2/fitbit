@@ -13,8 +13,11 @@ const app = express()
 app.set('port', (process.env.PORT || 8080))
 app.use('/', express.static(path.join(__dirname, 'public')))
 
-createJsonEndpoints(app, '/access-token', ACCESS_TOKEN_FILE)
-createJsonEndpoints(app, '/app', APP_FILE)
+createLocalJsonEndpoints(app, '/access-token', ACCESS_TOKEN_FILE)
+createLocalJsonEndpoints(app, '/app', APP_FILE)
+
+var fitbitClient = null
+createFitbitClient((client) => { fitbitClient = client })
 
 app.get('/', (req, res) => {
   res.sendFile(path.resolve(__dirname + './public/index.html'))
@@ -22,57 +25,43 @@ app.get('/', (req, res) => {
 
 // TODO: Make the date configurable. Probably want a post request for that.
 app.get('/activity', (req, res) => {
-  createFitbitClient((fitbitClient) => {
-    fitbitClient.getActivity('2016-05-10', (results) => {
-      const data = results[0]
-      res.json(data)
-    })
+  fitbitClient.getActivity('2016-05-10', (activity) => {
+    res.json(activity)
   })
 })
 
 // TODO: Make the dates configurable. Probably want a post request for that.
 app.get('/activity-time-series', (req, res) => {
-  createFitbitClient((fitbitClient) => {
-    fitbitClient.getActivityTimeSeries('activities/steps', '2016-05-10', '2016-05-17', (results) => {
-      console.log(results)
-      const data = results[0]
-      res.json(data)
-    })
-  })
+  fitbitClient.getActivityTimeSeries(
+    'activities/steps',
+    '2016-05-10',
+    '2016-05-17',
+    (activityTimeSeries) => { res.json(activityTimeSeries) }
+  )
 })
 
 app.get('/authenticate', (req, res) => {
-  createFitbitClient((fitbitClient) => {
-    const authorizeUrl = fitbitClient.getAuthorizeUrl(
-      'activity heartrate location nutrition profile settings sleep social',
-      FITBIT_AUTHORIZATION_CALLBACK_URL,
-    )
-    res.redirect(authorizeUrl)
-  })
+  const authorizeUrl = fitbitClient.getAuthorizeUrl(
+    FITBIT_AUTHORIZATION_CALLBACK_URL,
+  )
+  res.redirect(authorizeUrl)
 })
 
 app.get('/fitbit-callback', (req, res) => {
-  createFitbitClient((fitbitClient) => {
-    fitbitClient.getAccessToken(
-      req.query.code,
-      FITBIT_AUTHORIZATION_CALLBACK_URL,
-      (result) => {
-        // TODO: Store the access token and redirect to a valid url
-        console.log(JSON.stringify(result))
-        console.log('Access token: ' + result.access_token)
-        res.redirect('/')
-      },
-      (error) => { res.send(error) })
-  })
+  fitbitClient.getAccessToken(
+    req.query.code,
+    FITBIT_AUTHORIZATION_CALLBACK_URL,
+    (result) => {
+      fs.writeFile('json/access_token.json', JSON.stringify(result), (error) => {
+        if (error) throw error
+      })
+      res.redirect('/')
+    },
+    (error) => { res.send(error) })
 })
 
 app.get('/profile', (req, res) => {
-  createFitbitClient((fitbitClient) => {
-    fitbitClient.getProfile((results) => {
-      const data = results[0]
-      res.json(data)
-    })
-  })
+  fitbitClient.getProfile((profile) => { res.json(profile) })
 })
 
 app.listen(app.get('port'), () => {
@@ -80,28 +69,20 @@ app.listen(app.get('port'), () => {
 })
 
 function createFitbitClient(onCreate) {
-  fetchJson(APP_FILE, (appData) => {
-    fetchJson(ACCESS_TOKEN_FILE, (jsonData) => {
-      const client = new FitbitClient(
-        appData.client_id,
-        appData.client_secret,
-        jsonData.access_token,
-        jsonData.user_id,
-      )
-      onCreate(client)
+  fetchLocalJson(APP_FILE, (appData) => {
+    onCreate(new FitbitClient(appData.client_id, appData.client_secret))
+  })
+}
+
+function createLocalJsonEndpoints(app, apiPath, filePath) {
+  app.get(apiPath, (req, res) => {
+    fetchLocalJson(filePath, (jsonData) => {
+      res.json(jsonData)
     })
   })
 }
 
-function createJsonEndpoints(app, apiPath, filePath) {
-  app.get(apiPath, (req, res) => {
-    fetchJson(filePath, (jsonData) => {
-      res.json(jsonData)
-    });
-  });
-}
-
-function fetchJson(filePathToJson, onFetch) {
+function fetchLocalJson(filePathToJson, onFetch) {
   fs.readFile(filePathToJson, (err, data) => {
     if (err) {
       console.error(err)
@@ -109,5 +90,5 @@ function fetchJson(filePathToJson, onFetch) {
     } else {
       onFetch(JSON.parse(data))
     }
-  });
+  })
 }

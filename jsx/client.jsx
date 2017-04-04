@@ -1,16 +1,14 @@
-const FitbitApiClient = require('fitbit-node');
+const FitbitApiClient = require('fitbit-node')
 
 /**
  * Fetches data from Fitbit
  *
  * TODO: Use promises rather than callbacks
  */
-export default class Client {
+export default class FitbitClient {
 
-  constructor(clientId, clientSecret, accessToken, userId) {
-    this.accessToken = accessToken;
-    this.client = new FitbitApiClient(clientId, clientSecret);
-    this.userId = userId;
+  constructor(clientId, clientSecret) {
+    this.client = new FitbitApiClient(clientId, clientSecret)
   }
 
   /**
@@ -19,7 +17,11 @@ export default class Client {
    */
   getAccessToken(code, callbackUrl, onResult, onError) {
     this.client.getAccessToken(code, callbackUrl)
-      .then((result) => { onResult(result) })
+      .then((result) => {
+        console.log(result)
+        this._setAccessTokenInfo(result)
+        onResult(result)
+      })
       .catch((error) => { onError(error) })
   }
 
@@ -30,7 +32,7 @@ export default class Client {
   getActivity(date, onResult) {
     this.client
       .get('/activities/date/' + date + '.json', this.accessToken, this.userId)
-      .then((result) => { onResult(result) })
+      .then((result) => { onResult(result[0]) })
   }
 
   /**
@@ -42,7 +44,7 @@ export default class Client {
       '/' + resourcePath + '/date/' + baseDate + '/' + endDate + '.json',
       this.accessToken,
       this.userId,
-    ).then((result) => { onResult(result) })
+    ).then((result) => { onResult(result[0]) })
   }
 
   /**
@@ -50,9 +52,10 @@ export default class Client {
    * for more information
    */
   getAuthorizeUrl(callbackUrl) {
-    this.client.getAuthorizeUrl(
+    return this.client.getAuthorizeUrl(
       'activity heartrate location profile settings sleep social',
-      callbackUrl)
+      callbackUrl,
+    )
   }
 
   /**
@@ -61,6 +64,21 @@ export default class Client {
    */
   getProfile(onResult) {
     this.client.get('/profile.json', this.accessToken, this.userId)
-      .then((response) => { onResult(response) })
+      .then((result) => { onResult(result[0]) })
+  }
+
+  /**
+   * See {@link https://dev.fitbit.com/docs/oauth2/#refreshing-tokens Fitbit Refreshing Tokens Documentation}
+   * for more information
+   */
+  refreshAccessToken() {
+    this.client.refreshAccessToken(accessToken, refreshToken, -1)
+      .then((result) => { this._setAccessTokenInfo(result) })
+  }
+
+  _setAccessTokenInfo(result) {
+    this.accessToken = result.access_token
+    this.refreshToken = result.refresh_token
+    this.userId = result.user_id
   }
 }
