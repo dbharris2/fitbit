@@ -24,20 +24,19 @@ app.get('/', (req, res) => {
 })
 
 // TODO: Make the date configurable. Probably want a post request for that.
-app.get('/activity', (req, res) => {
-  fitbitClient.getActivity('2016-05-10', (activity) => {
-    res.json(activity)
-  })
+app.get('/activity', async (req, res) => {
+  const activity = await fitbitClient.getActivity('2016-05-10')
+  res.json(activity)
 })
 
 // TODO: Make the dates configurable. Probably want a post request for that.
-app.get('/activity-time-series', (req, res) => {
-  fitbitClient.getActivityTimeSeries(
+app.get('/activity-time-series', async (req, res) => {
+  const activityTimeSeries = await fitbitClient.getActivityTimeSeries(
     'activities/steps',
     '2016-05-10',
     '2016-05-17',
-    (activityTimeSeries) => { res.json(activityTimeSeries) }
   )
+  res.json(activityTimeSeries)
 })
 
 app.get('/authenticate', (req, res) => {
@@ -47,21 +46,18 @@ app.get('/authenticate', (req, res) => {
   res.redirect(authorizeUrl)
 })
 
-app.get('/fitbit-callback', (req, res) => {
-  fitbitClient.getAccessToken(
+app.get('/fitbit-callback', async (req, res) => {
+  const accessTokenInfo = await fitbitClient.getAccessToken(
     req.query.code,
     FITBIT_AUTHORIZATION_CALLBACK_URL,
-    (result) => {
-      fs.writeFile('json/access_token.json', JSON.stringify(result), (error) => {
-        if (error) throw error
-      })
-      res.redirect('/')
-    },
-    (error) => { res.send(error) })
+  )
+  fs.writeFile('json/access_token.json', JSON.stringify(accessTokenInfo))
+  res.redirect('/')
 })
 
-app.get('/profile', (req, res) => {
-  fitbitClient.getProfile((profile) => { res.json(profile) })
+app.get('/profile', async (req, res) => {
+  const profile = await fitbitClient.getProfile()
+  res.json(profile)
 })
 
 app.listen(app.get('port'), () => {
@@ -70,7 +66,11 @@ app.listen(app.get('port'), () => {
 
 function createFitbitClient(onCreate) {
   fetchLocalJson(APP_FILE, (appData) => {
-    onCreate(new FitbitClient(appData.client_id, appData.client_secret))
+    fetchLocalJson(ACCESS_TOKEN_FILE, (accessTokenInfo) => {
+      const client = new FitbitClient(appData.client_id, appData.client_secret)
+      client.setAccessTokenInfo(accessTokenInfo)
+      onCreate(client)
+    })
   })
 }
 
