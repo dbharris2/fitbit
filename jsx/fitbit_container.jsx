@@ -1,6 +1,8 @@
 import React from 'react'
 import axios from 'axios'
 
+import { LineChart } from 'react-chartkick'
+
 type FitbitContainerProps = {}
 
 export default class FitbitContainer extends React.Component {
@@ -61,15 +63,20 @@ export default class FitbitContainer extends React.Component {
         <p>Steps on 2016-05-10: {this.state.activity == null ? "" : this.state.activity.summary.steps}</p>
         <p>Floors on 2016-05-10: {this.state.activity == null ? "" : this.state.activity.summary.floors}</p>
 
-        <h3>Activity Time Series Info</h3>
+        <h3>Steps Per Day</h3>
         {
-          this.state.activityTimeSeries == null ? "" : this.state.activityTimeSeries.map((activityTimeSeries) => {
-            return (
-              <div key={activityTimeSeries.dateTime}>
-                <p>Steps on {activityTimeSeries.dateTime}: {activityTimeSeries.value}</p>
-              </div>
-            )
-          })
+          this.state.activityTimeSeries == null ?
+          "" :
+          <LineChart
+            data={this.state.activityTimeSeries.map((activityTimeSeries) => {
+              return [
+                activityTimeSeries.dateTime,
+                activityTimeSeries.value,
+              ]
+            })}
+            xtitle={'Date'}
+            ytitle={'Steps'}
+            />
         }
       </div>
     )
