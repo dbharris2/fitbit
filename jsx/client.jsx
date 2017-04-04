@@ -72,9 +72,14 @@ export default class FitbitClient {
    * See {@link https://dev.fitbit.com/docs/oauth2/#refreshing-tokens Fitbit Refreshing Tokens Documentation}
    * for more information
    */
-  refreshAccessToken() {
-    this.client.refreshAccessToken(accessToken, refreshToken, -1)
-      .then((result) => { this.setAccessTokenInfo(result) })
+  async refreshAccessToken() {
+    const accessTokenInfo = await this.client.refreshAccessToken(
+      this.accessToken,
+      this.refreshToken,
+      -1,
+    )
+    this.setAccessTokenInfo(accessTokenInfo)
+    return accessTokenInfo
   }
 
   setAccessTokenInfo(accessTokenInfo) {
