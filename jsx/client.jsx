@@ -1,12 +1,25 @@
+/* @flow */
+
 import FitbitApiClient from 'fitbit-node';
 
 require('babel-polyfill');
+
+type AccessTokenInfo = {
+  access_token: string,
+  refresh_token: string,
+  user_id: string,
+};
 
 /**
  * Fetches data from Fitbit
  */
 export default class FitbitClient {
-  constructor(clientId, clientSecret) {
+  accessToken: string;
+  client: FitbitApiClient;
+  refreshToken: string;
+  userId: string;
+
+  constructor(clientId: string, clientSecret: string) {
     this.client = new FitbitApiClient(clientId, clientSecret);
   }
 
@@ -14,7 +27,7 @@ export default class FitbitClient {
    * See {@link https://dev.fitbit.com/docs/oauth2/#access-token-request Fitbit Access Token Request}
    * for more information
    */
-  async getAccessToken(code, callbackUrl) {
+  async getAccessToken(code: string, callbackUrl: string) {
     const accessTokenInfo = await this.client.getAccessToken(code, callbackUrl);
     this.setAccessTokenInfo(accessTokenInfo);
     return accessTokenInfo;
@@ -24,7 +37,7 @@ export default class FitbitClient {
    * See {@link https://dev.fitbit.com/docs/activity/#get-daily-activity-summary Fitbit Activity Documentation}
    * for more information
    */
-  async getActivity(date, onResult) {
+  async getActivity(date: string) {
     const activity = await this.client.get(
       '/activities/date/' + date + '.json',
       this.accessToken,
@@ -37,7 +50,11 @@ export default class FitbitClient {
    * See {@link https://dev.fitbit.com/docs/activity/#activity-time-series Fitbit Activity Time Series Documentation}
    * for more information
    */
-  async getActivityTimeSeries(resourcePath, baseDate, endDate, onResult) {
+  async getActivityTimeSeries(
+    resourcePath: string,
+    baseDate: string,
+    endDate: string,
+  ) {
     const activityTimeSeries = await this.client.get(
       '/' + resourcePath + '/date/' + baseDate + '/' + endDate + '.json',
       this.accessToken,
@@ -50,7 +67,7 @@ export default class FitbitClient {
    * See {@link https://dev.fitbit.com/docs/oauth2/ Fitbit Authorization Documentation}
    * for more information
    */
-  getAuthorizeUrl(callbackUrl) {
+  getAuthorizeUrl(callbackUrl: string) {
     return this.client.getAuthorizeUrl(
       'activity heartrate location profile settings sleep social',
       callbackUrl,
@@ -84,7 +101,7 @@ export default class FitbitClient {
     return accessTokenInfo;
   }
 
-  setAccessTokenInfo(accessTokenInfo) {
+  setAccessTokenInfo(accessTokenInfo: AccessTokenInfo) {
     this.accessToken = accessTokenInfo.access_token;
     this.refreshToken = accessTokenInfo.refresh_token;
     this.userId = accessTokenInfo.user_id;

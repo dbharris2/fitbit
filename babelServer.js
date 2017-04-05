@@ -1,3 +1,5 @@
+/* @flow */
+
 import express from 'express';
 import fs from 'fs';
 import path from 'path';
@@ -27,39 +29,49 @@ app.get('/', (req, res) => {
 
 // TODO: Make the date configurable. Probably want a post request for that.
 app.get('/activity', async (req, res) => {
-  const activity = await fitbitClient.getActivity('2016-05-10');
-  res.json(activity);
+  if (fitbitClient) {
+    const activity = await fitbitClient.getActivity('2016-05-10');
+    res.json(activity);
+  }
 });
 
 // TODO: Make the dates configurable. Probably want a post request for that.
 app.get('/activity-time-series', async (req, res) => {
-  const activityTimeSeries = await fitbitClient.getActivityTimeSeries(
-    'activities/steps',
-    '2016-05-10',
-    '2016-05-17',
-  );
-  res.json(activityTimeSeries);
+  if (fitbitClient) {
+    const activityTimeSeries = await fitbitClient.getActivityTimeSeries(
+      'activities/steps',
+      '2016-05-10',
+      '2016-05-17',
+    );
+    res.json(activityTimeSeries);
+  }
 });
 
 app.get('/authenticate', (req, res) => {
-  const authorizeUrl = fitbitClient.getAuthorizeUrl(
-    FITBIT_AUTHORIZATION_CALLBACK_URL,
-  );
-  res.redirect(authorizeUrl);
+  if (fitbitClient) {
+    const authorizeUrl = fitbitClient.getAuthorizeUrl(
+      FITBIT_AUTHORIZATION_CALLBACK_URL,
+    );
+    res.redirect(authorizeUrl);
+  }
 });
 
 app.get('/fitbit-callback', async (req, res) => {
-  const accessTokenInfo = await fitbitClient.getAccessToken(
-    req.query.code,
-    FITBIT_AUTHORIZATION_CALLBACK_URL,
-  );
-  fs.writeFile('json/access_token.json', JSON.stringify(accessTokenInfo));
-  res.redirect('/');
+  if (fitbitClient) {
+    const accessTokenInfo = await fitbitClient.getAccessToken(
+      req.query.code,
+      FITBIT_AUTHORIZATION_CALLBACK_URL,
+    );
+    fs.writeFile('json/access_token.json', JSON.stringify(accessTokenInfo));
+    res.redirect('/');
+  }
 });
 
 app.get('/profile', async (req, res) => {
-  const profile = await fitbitClient.getProfile();
-  res.json(profile);
+  if (fitbitClient) {
+    const profile = await fitbitClient.getProfile();
+    res.json(profile);
+  }
 });
 
 app.listen(app.get('port'), () => {
@@ -90,7 +102,7 @@ function fetchLocalJson(filePathToJson, onFetch) {
       console.error(err);
       process.exit(1);
     } else {
-      onFetch(JSON.parse(data));
+      onFetch(JSON.parse(String(data)));
     }
   });
 }
