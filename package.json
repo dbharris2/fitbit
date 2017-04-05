@@ -5,9 +5,10 @@
   "license": "MIT",
   "scripts": {
     "dev": "webpack-dev-server --progress --colors",
+    "flow": "flow",
     "lint-staged": "lint-staged",
     "postinstall": "webpack -p",
-    "precommit": "lint-staged",
+    "precommit": "lint-staged && flow",
     "watch": "webpack --watch"
   },
   "precommit": "lint-staged",
