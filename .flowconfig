@@ -1,0 +1,13 @@
+[ignore]
+.*/json/.*
+.*/public/.*
+<PROJECT_ROOT>/node_modules/config-chain/test/broken.json
+<PROJECT_ROOT>/node_modules/fbjs/lib/PromiseMap.js.flow
+<PROJECT_ROOT>/node_modules/fbjs/lib/fetchWithRetries.js.flow
+<PROJECT_ROOT>/node_modules/npm/node_modules/config-chain/test/broken.json
+
+[include]
+
+[libs]
+
+[options]

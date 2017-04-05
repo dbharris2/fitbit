@@ -13,11 +13,11 @@
   "precommit": "lint-staged",
   "lint-staged": {
     "*.js": [
-      "prettier --single-quote --trailing-comma all --bracket-spacing false --write",
+      "prettier --single-quote --trailing-comma all --bracket-spacing false --parser flow --write",
       "git add"
     ],
     "*.jsx": [
-      "prettier --single-quote --trailing-comma all --bracket-spacing false --write",
+      "prettier --single-quote --trailing-comma all --bracket-spacing false --parser flow --write",
       "git add"
     ]
   },
@@ -42,6 +42,7 @@
     "webpack": "1.12.12"
   },
   "devDependencies": {
+    "flow-bin": "^0.43.0",
     "husky": "^0.13.3",
     "lint-staged": "^3.4.0",
     "prettier": "^0.22.0",
