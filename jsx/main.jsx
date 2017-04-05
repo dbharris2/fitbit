@@ -1,10 +1,6 @@
+import React from 'react';
+import ReactDOM from 'react-dom';
 
-import React from 'react'
-import ReactDOM from 'react-dom'
+import FitbitContainer from './fitbit_container';
 
-import FitbitContainer from './fitbit_container'
-
-ReactDOM.render(
-  <FitbitContainer />,
-  document.getElementById('content')
-)
+ReactDOM.render(<FitbitContainer />, document.getElementById('content'));
