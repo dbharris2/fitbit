@@ -1,14 +1,13 @@
-import FitbitApiClient from 'fitbit-node'
+import FitbitApiClient from 'fitbit-node';
 
-require('babel-polyfill')
+require('babel-polyfill');
 
 /**
  * Fetches data from Fitbit
  */
 export default class FitbitClient {
-
   constructor(clientId, clientSecret) {
-    this.client = new FitbitApiClient(clientId, clientSecret)
+    this.client = new FitbitApiClient(clientId, clientSecret);
   }
 
   /**
@@ -16,9 +15,9 @@ export default class FitbitClient {
    * for more information
    */
   async getAccessToken(code, callbackUrl) {
-    const accessTokenInfo = await this.client.getAccessToken(code, callbackUrl)
-    this.setAccessTokenInfo(accessTokenInfo)
-    return accessTokenInfo
+    const accessTokenInfo = await this.client.getAccessToken(code, callbackUrl);
+    this.setAccessTokenInfo(accessTokenInfo);
+    return accessTokenInfo;
   }
 
   /**
@@ -26,9 +25,12 @@ export default class FitbitClient {
    * for more information
    */
   async getActivity(date, onResult) {
-    const activity = await this.client
-      .get('/activities/date/' + date + '.json', this.accessToken, this.userId)
-    return activity[0]
+    const activity = await this.client.get(
+      '/activities/date/' + date + '.json',
+      this.accessToken,
+      this.userId,
+    );
+    return activity[0];
   }
 
   /**
@@ -40,8 +42,8 @@ export default class FitbitClient {
       '/' + resourcePath + '/date/' + baseDate + '/' + endDate + '.json',
       this.accessToken,
       this.userId,
-    )
-    return activityTimeSeries[0]
+    );
+    return activityTimeSeries[0];
   }
 
   /**
@@ -52,7 +54,7 @@ export default class FitbitClient {
     return this.client.getAuthorizeUrl(
       'activity heartrate location profile settings sleep social',
       callbackUrl,
-    )
+    );
   }
 
   /**
@@ -64,8 +66,8 @@ export default class FitbitClient {
       '/profile.json',
       this.accessToken,
       this.userId,
-    )
-    return profile[0]
+    );
+    return profile[0];
   }
 
   /**
@@ -77,14 +79,14 @@ export default class FitbitClient {
       this.accessToken,
       this.refreshToken,
       -1,
-    )
-    this.setAccessTokenInfo(accessTokenInfo)
-    return accessTokenInfo
+    );
+    this.setAccessTokenInfo(accessTokenInfo);
+    return accessTokenInfo;
   }
 
   setAccessTokenInfo(accessTokenInfo) {
-    this.accessToken = accessTokenInfo.access_token
-    this.refreshToken = accessTokenInfo.refresh_token
-    this.userId = accessTokenInfo.user_id
+    this.accessToken = accessTokenInfo.access_token;
+    this.refreshToken = accessTokenInfo.refresh_token;
+    this.userId = accessTokenInfo.user_id;
   }
 }
