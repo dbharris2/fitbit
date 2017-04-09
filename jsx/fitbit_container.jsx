@@ -49,8 +49,7 @@ export default class FitbitContainer extends React.Component {
               console.log(user);
               return (
                 <div key={user.displayName}>
-                  <h3>Profile Info</h3>
-                  <img src={user.avatar} />
+                  <img src={user.avatar} width={50} />
                   <p>Name: {user.displayName}</p>
                   <p>Fitbit Member Since: {user.memberSince}</p>
                 </div>
