@@ -7,6 +7,24 @@ import {LineChart} from 'react-chartkick';
 
 type FitbitContainerProps = {};
 
+function formatActivityTimeSeriesData(
+  activityTimeSeriesData: Array<Object>,
+): Array<Object> {
+  const totalData: Array<Object> = activityTimeSeriesData.map(
+    (activityTimeSeries: Object) => {
+      const activityTimeSeriesUserData: Object = {};
+      activityTimeSeries['activities-steps'].forEach(steps => {
+        activityTimeSeriesUserData[steps.dateTime] = steps.value;
+      });
+      return {
+        name: 'Name of User',
+        data: activityTimeSeriesUserData,
+      };
+    },
+  );
+  return totalData;
+}
+
 export default class FitbitContainer extends React.Component {
   props: FitbitContainerProps;
 
@@ -46,7 +64,6 @@ export default class FitbitContainer extends React.Component {
         {this.state.users == null
           ? ''
           : this.state.users.map((user: Object) => {
-              console.log(user);
               return (
                 <div key={user.displayName}>
                   <img src={user.avatar} width={50} />
@@ -57,8 +74,18 @@ export default class FitbitContainer extends React.Component {
             })}
         {this.state.activityTimeSeries == null
           ? ''
+          : <div>
+              <LineChart
+                data={formatActivityTimeSeriesData(
+                  this.state.activityTimeSeries,
+                )}
+                xtitle={'Date'}
+                ytitle={'Steps'}
+              />
+            </div>}
+        {this.state.activityTimeSeries == null
+          ? ''
           : this.state.activityTimeSeries.map((activityTimeSeries: Object) => {
-              console.log(activityTimeSeries['activities-steps']);
               return (
                 <div>
                   <LineChart
