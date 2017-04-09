@@ -28,8 +28,8 @@ app.get('/', (req, res) => {
 app.get('/activity-time-series', async (req, res) => {
   const allActivityTimeSeries: Array<Object> = await fitbitClientManager.getAllActivityTimeSeries(
     'activities/steps',
-    '2016-05-10',
-    '2016-05-17',
+    '2017-04-01',
+    '2017-04-07',
   );
   res.json(allActivityTimeSeries);
 });
@@ -48,6 +48,7 @@ app.get('/fitbit-callback', async (req, res) => {
     req.query.code,
     FITBIT_AUTHORIZATION_CALLBACK_URL,
   );
+  console.log('Need to add new client to client manager');
   fitbitClientManager.addClient(client);
   res.redirect('/');
 });
@@ -58,12 +59,14 @@ app.get('/profile', async (req, res) => {
 });
 
 app.listen(app.get('port'), async () => {
-  const localFitbitClients: Array<FitbitClient> = await FitbitClientLoader.loadLocalClients();
+  const localFitbitClients: Array<FitbitClient> = await FitbitClientLoader.loadLocalClients(
+    fitbitClientManager,
+  );
   fitbitClientManager.addClients(localFitbitClients);
   console.log('Server started: http://localhost:' + app.get('port') + '/');
 });
 
 async function createFitbitClient() {
   const fitbitApp: FitbitApp = await AppLoader.loadAppData();
-  return new FitbitClient(fitbitApp);
+  return new FitbitClient(fitbitApp, fitbitClientManager);
 }

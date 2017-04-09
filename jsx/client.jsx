@@ -5,6 +5,7 @@ import assert from 'assert';
 import AccessTokenInfo from './access_token_info';
 import FitbitApiClient from 'fitbit-node';
 import FitbitApp from './app';
+import FitbitClientManager from './client_manager';
 
 /**
  * Fetches data from Fitbit
@@ -12,12 +13,14 @@ import FitbitApp from './app';
 export default class FitbitClient {
   accessTokenInfo: AccessTokenInfo;
   client: FitbitApiClient;
+  clientManager: FitbitClientManager;
 
-  constructor(fitbitApp: FitbitApp) {
+  constructor(fitbitApp: FitbitApp, fitbitClientManager: FitbitClientManager) {
     this.client = new FitbitApiClient(
       fitbitApp.getClientId(),
       fitbitApp.getClientSecret(),
     );
+    this.clientManager = fitbitClientManager;
   }
 
   getAccessTokenInfo(): AccessTokenInfo {
@@ -35,6 +38,7 @@ export default class FitbitClient {
       code,
       callbackUrl,
     );
+    console.log('Setting access token info via authentication');
     console.log(accessTokenInfo);
     this.setAccessTokenInfo(accessTokenInfo);
   }
@@ -85,9 +89,17 @@ export default class FitbitClient {
     }
   }
 
+  replaceAccessTokenInfo(accessTokenInfo: AccessTokenInfo): void {
+    this.accessTokenInfo = accessTokenInfo;
+    this.clientManager.saveClients();
+  }
+
   setAccessTokenInfo(accessTokenInfo: Object): void {
     assert(accessTokenInfo != null);
     this.accessTokenInfo = AccessTokenInfo.fromJson(accessTokenInfo);
+    console.log('setAccessTokenInfo');
+    console.log(this.accessTokenInfo);
+    this.clientManager.saveClients();
   }
 
   async _getActivityTimeSeries(
