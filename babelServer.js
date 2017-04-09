@@ -1,85 +1,69 @@
 /* @flow */
 
-import express from 'express';
 import * as fs from 'async-file';
+import express from 'express';
 import path from 'path';
 
+import AppLoader from './jsx/app_loader';
+import FitbitApp from './jsx/app';
 import FitbitClient from './jsx/client';
+import FitbitClientLoader from './jsx/client_loader';
+import FitbitClientManager from './jsx/client_manager';
 
-const APP_FILE = path.join(__dirname, 'json/app.json');
-const FITBIT_AUTHORIZATION_CALLBACK_URL = 'https://localhost:8080/fitbit-callback';
+require('babel-polyfill');
 
-const app = express();
+const FITBIT_AUTHORIZATION_CALLBACK_URL: string = 'https://localhost:8080/fitbit-callback';
+
+const app: Object = express();
 
 app.set('port', process.env.PORT || 8080);
 app.use('/', express.static(path.join(__dirname, 'public')));
 
-var fitbitClient = null;
-createFitbitClient(client => {
-  fitbitClient = client;
-});
+const fitbitClientManager: FitbitClientManager = new FitbitClientManager();
 
 app.get('/', (req, res) => {
   res.sendFile(path.resolve(__dirname + './public/index.html'));
 });
 
-// TODO: Make the dates configurable. Probably want a post request for that.
 app.get('/activity-time-series', async (req, res) => {
-  if (fitbitClient) {
-    const activityTimeSeries = await fitbitClient.getActivityTimeSeries(
-      'activities/steps',
-      '2016-05-10',
-      '2016-05-17',
-    );
-    res.json(activityTimeSeries);
-  }
+  const allActivityTimeSeries: Array<Object> = await fitbitClientManager.getAllActivityTimeSeries(
+    'activities/steps',
+    '2016-05-10',
+    '2016-05-17',
+  );
+  res.json(allActivityTimeSeries);
 });
 
-app.get('/app', async (req, res) => {
-  const jsonData: Object = await fetchLocalJson(APP_FILE);
-  res.json(jsonData);
-});
-
-app.get('/authenticate', (req, res) => {
-  if (fitbitClient) {
-    const authorizeUrl = fitbitClient.getAuthorizeUrl(
-      FITBIT_AUTHORIZATION_CALLBACK_URL,
-    );
-    res.redirect(authorizeUrl);
-  }
+app.get('/authenticate', async (req, res) => {
+  const client: FitbitClient = await createFitbitClient();
+  const authorizeUrl: string = client.getAuthorizeUrl(
+    FITBIT_AUTHORIZATION_CALLBACK_URL,
+  );
+  res.redirect(authorizeUrl);
 });
 
 app.get('/fitbit-callback', async (req, res) => {
-  if (fitbitClient) {
-    const accessTokenInfo = await fitbitClient.getAccessToken(
-      req.query.code,
-      FITBIT_AUTHORIZATION_CALLBACK_URL,
-    );
-    res.redirect('/');
-  }
+  const client: FitbitClient = await createFitbitClient();
+  await client.setAccessToken(
+    req.query.code,
+    FITBIT_AUTHORIZATION_CALLBACK_URL,
+  );
+  fitbitClientManager.addClient(client);
+  res.redirect('/');
 });
 
 app.get('/profile', async (req, res) => {
-  if (fitbitClient) {
-    const profile = await fitbitClient.getProfile();
-    res.json(profile);
-  }
+  const profiles: Array<Object> = await fitbitClientManager.getAllProfiles();
+  res.json(profiles);
 });
 
-app.listen(app.get('port'), () => {
+app.listen(app.get('port'), async () => {
+  const localFitbitClients: Array<FitbitClient> = await FitbitClientLoader.loadLocalClients();
+  fitbitClientManager.addClients(localFitbitClients);
   console.log('Server started: http://localhost:' + app.get('port') + '/');
 });
 
-async function createFitbitClient(onCreate) {
-  const appData: Object = await fetchLocalJson(APP_FILE);
-  const client: FitbitClient = new FitbitClient(
-    appData.client_id,
-    appData.client_secret,
-  );
-  onCreate(client);
-}
-
-async function fetchLocalJson(filePathToJson) {
-  const json: Object = await fs.readFile(filePathToJson);
-  return JSON.parse(String(json));
+async function createFitbitClient() {
+  const fitbitApp: FitbitApp = await AppLoader.loadAppData();
+  return new FitbitClient(fitbitApp);
 }
