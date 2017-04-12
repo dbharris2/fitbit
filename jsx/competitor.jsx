@@ -9,7 +9,7 @@ export default function Competitor(
   props: {
     imageUri: string,
     size: number,
-    subtitle: string,
+    subtitle: ?string,
     title: string,
   },
 ) {
@@ -25,10 +25,8 @@ export default function Competitor(
         justifyContent="center"
         paddingLeft="10px"
       >
-        <div>
-          <h3>{props.title}</h3>
-          <h5>{props.subtitle}</h5>
-        </div>
+        <h3>{props.title}</h3>
+        {props.subtitle == null ? null : <h5>{props.subtitle}</h5>}
       </Flexbox>
     </Flexbox>
   );
