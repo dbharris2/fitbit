@@ -36,6 +36,8 @@
     "chartkick": "^2.2.3",
     "express": "^4.15.0",
     "fitbit-node": "^2.0.5",
+    "flexbox-react": "^4.3.1",
+    "material-ui": "^0.17.3",
     "npm": "^4.3.0",
     "react": "0.14.7",
     "react-chartkick": "^0.1.3",

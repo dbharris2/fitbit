@@ -5,6 +5,20 @@
 <PROJECT_ROOT>/node_modules/fbjs/lib/PromiseMap.js.flow
 <PROJECT_ROOT>/node_modules/fbjs/lib/fetchWithRetries.js.flow
 <PROJECT_ROOT>/node_modules/npm/node_modules/config-chain/test/broken.json
+<PROJECT_ROOT>/node_modules/styled-components/dangerfile.js
+<PROJECT_ROOT>/node_modules/styled-components/lib/models/InlineStyle.js.flow
+<PROJECT_ROOT>/node_modules/styled-components/lib/models/StyleSheet.js.flow
+<PROJECT_ROOT>/node_modules/styled-components/lib/native/index.js.flow
+<PROJECT_ROOT>/node_modules/styled-components/src/models/InlineStyle.js
+<PROJECT_ROOT>/node_modules/styled-components/src/models/StyleSheet.js
+<PROJECT_ROOT>/node_modules/styled-components/src/native/index.js
+<PROJECT_ROOT>/node_modules/styled-components/src/test/utils.js
+<PROJECT_ROOT>/node_modules/styled-components/src/models/ComponentStyle.js
+<PROJECT_ROOT>/node_modules/styled-components/src/models/GlobalStyle.js
+<PROJECT_ROOT>/node_modules/styled-components/src/models/StyledNativeComponent.js
+<PROJECT_ROOT>/node_modules/styled-components/src/constructors/injectGlobal.js
+<PROJECT_ROOT>/node_modules/styled-components/src/constructors/keyframes.js
+<PROJECT_ROOT>/node_modules/styled-components/src/index.js
 
 [include]
 
