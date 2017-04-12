@@ -1,9 +1,12 @@
 /* @flow */
 
+import Flexbox from 'flexbox-react';
+import RaisedButton from 'material-ui/RaisedButton';
 import React from 'react';
 import axios from 'axios';
-
 import {LineChart} from 'react-chartkick';
+
+import Competitor from './competitor';
 
 type FitbitContainerProps = {};
 
@@ -59,46 +62,68 @@ export default class FitbitContainer extends React.Component {
 
   render() {
     return (
-      <div>
-        <h1>2017 Fitbit Competition</h1>
-        {this.state.users == null
-          ? ''
-          : this.state.users.map((user: Object) => {
-              return (
-                <div key={user.displayName}>
-                  <img src={user.avatar} width={50} />
-                  <p>Name: {user.displayName}</p>
-                  <p>Fitbit Member Since: {user.memberSince}</p>
-                </div>
-              );
-            })}
-        {this.state.activityTimeSeries == null
-          ? ''
-          : <div>
-              <LineChart
-                data={formatActivityTimeSeriesData(
-                  this.state.activityTimeSeries,
-                )}
-                xtitle={'Date'}
-                ytitle={'Steps'}
-              />
-            </div>}
-        {this.state.activityTimeSeries == null
-          ? ''
-          : this.state.activityTimeSeries.map((activityTimeSeries: Object) => {
-              return (
-                <div>
-                  <LineChart
-                    data={activityTimeSeries['activities-steps'].map(steps => {
-                      return [steps.dateTime, steps.value];
-                    })}
-                    xtitle={'Date'}
-                    ytitle={'Steps'}
-                  />
-                </div>
-              );
-            })}
-      </div>
+      <Flexbox flexDirection="column">
+        <Flexbox flexDirection="row" justifyContent="center">
+          <h1>2017 Fitbit Competition</h1>
+        </Flexbox>
+
+        <Flexbox flexDirection="row" justifyContent="space-around">
+          {this.state.users == null
+            ? null
+            : this.state.users.map((user: Object) => {
+                return (
+                  <div key={user.displayName}>
+                    <Competitor
+                      imageUri={user.avatar}
+                      size={80}
+                      subtitle={user.memberSince}
+                      title={user.displayName}
+                    />
+                  </div>
+                );
+              })}
+        </Flexbox>
+
+        <Flexbox alignItems="center" flexDirection="column" paddingTop="40px">
+          <RaisedButton
+            href="/authenticate"
+            label="Join the Fun!"
+            primary={true}
+            style={{margin: 12}}
+          />
+
+          {this.state.activityTimeSeries == null
+            ? null
+            : <div>
+                <LineChart
+                  data={formatActivityTimeSeriesData(
+                    this.state.activityTimeSeries,
+                  )}
+                  xtitle={'Date'}
+                  ytitle={'Steps'}
+                />
+              </div>}
+          {this.state.activityTimeSeries == null
+            ? null
+            : this.state.activityTimeSeries.map(
+                (activityTimeSeries: Object) => {
+                  return (
+                    <div>
+                      <LineChart
+                        data={activityTimeSeries[
+                          'activities-steps'
+                        ].map(steps => {
+                          return [steps.dateTime, steps.value];
+                        })}
+                        xtitle={'Date'}
+                        ytitle={'Steps'}
+                      />
+                    </div>
+                  );
+                },
+              )}
+        </Flexbox>
+      </Flexbox>
     );
   }
 }
