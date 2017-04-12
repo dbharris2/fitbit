@@ -1,16 +1,59 @@
 /* @flow */
 
 import Flexbox from 'flexbox-react';
+import Paper from 'material-ui/Paper';
 import RaisedButton from 'material-ui/RaisedButton';
 import React from 'react';
 import axios from 'axios';
 import {LineChart} from 'react-chartkick';
 
 import Competitor from './competitor';
+import CompetitorStory from './competitor_story';
 
 type FitbitContainerProps = {};
 
-function formatActivityTimeSeriesData(
+function renderActivityTimeSeries(
+  activityTimeSeries: ?Array<Object>,
+  user: Object,
+) {
+  return activityTimeSeries == null || user == null
+    ? null
+    : activityTimeSeries.map((ats: Object) => {
+        return (
+          <CompetitorStory
+            data={ats['activities-steps'].map(steps => {
+              return [steps.dateTime, steps.value];
+            })}
+            imageUri={user.avatar}
+            size={80}
+            style={{
+              marginBottom: '10px',
+              padding: '10px',
+            }}
+            title={user.displayName}
+          />
+        );
+      });
+}
+
+function renderCompetitors(users: ?Array<Object>) {
+  return users == null
+    ? null
+    : users.map((user: Object) => {
+        return (
+          <div key={user.displayName}>
+            <Competitor
+              imageUri={user.avatar}
+              size={80}
+              subtitle={null}
+              title={user.displayName}
+            />
+          </div>
+        );
+      });
+}
+
+function formatAllCompetitorsActivityTimeSeriesData(
   activityTimeSeriesData: Array<Object>,
 ): Array<Object> {
   const totalData: Array<Object> = activityTimeSeriesData.map(
@@ -68,23 +111,10 @@ export default class FitbitContainer extends React.Component {
         </Flexbox>
 
         <Flexbox flexDirection="row" justifyContent="space-around">
-          {this.state.users == null
-            ? null
-            : this.state.users.map((user: Object) => {
-                return (
-                  <div key={user.displayName}>
-                    <Competitor
-                      imageUri={user.avatar}
-                      size={80}
-                      subtitle={user.memberSince}
-                      title={user.displayName}
-                    />
-                  </div>
-                );
-              })}
+          {renderCompetitors(this.state.users)}
         </Flexbox>
 
-        <Flexbox alignItems="center" flexDirection="column" paddingTop="40px">
+        <Flexbox alignItems="stretch" flexDirection="column" paddingTop="40px">
           <RaisedButton
             href="/authenticate"
             label="Join the Fun!"
@@ -92,35 +122,25 @@ export default class FitbitContainer extends React.Component {
             style={{margin: 12}}
           />
 
-          {this.state.activityTimeSeries == null
+          <Paper style={{marginBottom: '10px', padding: '10px'}}>
+            {this.state.activityTimeSeries == null
+              ? null
+              : <div>
+                  <LineChart
+                    data={formatAllCompetitorsActivityTimeSeriesData(
+                      this.state.activityTimeSeries,
+                    )}
+                    xtitle={'Date'}
+                    ytitle={'Steps'}
+                  />
+                </div>}
+          </Paper>
+
+          {this.state.users == null
             ? null
-            : <div>
-                <LineChart
-                  data={formatActivityTimeSeriesData(
-                    this.state.activityTimeSeries,
-                  )}
-                  xtitle={'Date'}
-                  ytitle={'Steps'}
-                />
-              </div>}
-          {this.state.activityTimeSeries == null
-            ? null
-            : this.state.activityTimeSeries.map(
-                (activityTimeSeries: Object) => {
-                  return (
-                    <div>
-                      <LineChart
-                        data={activityTimeSeries[
-                          'activities-steps'
-                        ].map(steps => {
-                          return [steps.dateTime, steps.value];
-                        })}
-                        xtitle={'Date'}
-                        ytitle={'Steps'}
-                      />
-                    </div>
-                  );
-                },
+            : renderActivityTimeSeries(
+                this.state.activityTimeSeries,
+                this.state.users[0],
               )}
         </Flexbox>
       </Flexbox>
