@@ -21,6 +21,7 @@ export default function CompetitorStory(
       <Competitor
         imageUri={props.imageUri}
         size={80}
+        style={null}
         subtitle={null}
         title={props.title}
       />
