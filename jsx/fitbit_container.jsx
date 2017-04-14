@@ -23,6 +23,7 @@ type FitbitCompetitor = {
   activityTimeSeries: Object,
   profile: Profile,
   totalActivityTimeSeries: Object,
+  totalSteps: string,
 };
 
 type FitbitContainerProps = {};
@@ -58,17 +59,16 @@ function _renderCompetitors(
 ): Array<Object> {
   return competitors.map((competitor: FitbitCompetitor) => {
     return (
-      <Flexbox flexDirection="row" key={competitor.profile.user.displayName}>
-        <Competitor
-          imageUri={competitor.profile.user.avatar}
-          size={80}
-          subtitle={null}
-          style={{
-            marginBottom: '30px',
-          }}
-          title={competitor.profile.user.displayName}
-        />
-      </Flexbox>
+      <Competitor
+        imageUri={competitor.profile.user.avatar}
+        key={competitor.profile.user.displayName}
+        size={100}
+        style={{
+          marginBottom: '30px',
+        }}
+        subtitle={'Total steps: ' + competitor.totalSteps}
+        title={competitor.profile.user.displayName}
+      />
     );
   });
 }
@@ -119,7 +119,8 @@ export default class FitbitContainer extends React.Component {
 
   render() {
     return (
-      <Flexbox flexDirection="column">
+      <Flexbox alignItems="stretch" flexDirection="column">
+
         <Flexbox flexDirection="row" justifyContent="center">
           <h1>2017 Fitbit Competition</h1>
         </Flexbox>
@@ -128,30 +129,26 @@ export default class FitbitContainer extends React.Component {
           {renderCompetitors(this.state.competitors)}
         </Flexbox>
 
-        <Flexbox alignItems="stretch" flexDirection="column" paddingTop="40px">
-          <RaisedButton
-            href="/authenticate"
-            label="Join the Fun!"
-            primary={true}
-            style={{margin: 12}}
-          />
+        <RaisedButton
+          href="/authenticate"
+          label="Join the Fun!"
+          primary={true}
+          style={{margin: 12}}
+        />
 
-          <Paper style={{marginBottom: '10px', padding: '10px'}}>
-            {this.state.competitors == null
-              ? null
-              : <div>
-                  <LineChart
-                    data={formatCompetitorsActivityTimeSeriesData(
-                      this.state.competitors,
-                    )}
-                    xtitle={'Date'}
-                    ytitle={'Steps'}
-                  />
-                </div>}
-          </Paper>
+        <Paper style={{marginBottom: '10px', padding: '10px'}}>
+          {this.state.competitors == null
+            ? null
+            : <LineChart
+                data={formatCompetitorsActivityTimeSeriesData(
+                  this.state.competitors,
+                )}
+                xtitle={'Date'}
+                ytitle={'Steps'}
+              />}
+        </Paper>
 
-          {renderActivityTimeSeries(this.state.competitors)}
-        </Flexbox>
+        {renderActivityTimeSeries(this.state.competitors)}
       </Flexbox>
     );
   }

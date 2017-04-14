@@ -27,7 +27,9 @@ export default function Competitor(
         paddingLeft="10px"
       >
         <h3>{props.title}</h3>
-        {props.subtitle == null ? null : <h5>{props.subtitle}</h5>}
+        {props.subtitle == null
+          ? null
+          : <h5 style={{marginTop: '-10px'}}>{props.subtitle}</h5>}
       </Flexbox>
     </Flexbox>
   );
