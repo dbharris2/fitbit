@@ -25,8 +25,8 @@ app.get('/', (req, res) => {
   res.sendFile(path.resolve(__dirname + './public/index.html'));
 });
 
-app.get('/activity-time-series', async (req, res) => {
-  const allActivityTimeSeries: Array<Object> = await fitbitClientManager.getAllActivityTimeSeries(
+app.get('/competitors', async (req, res) => {
+  const allActivityTimeSeries: Array<Object> = await fitbitClientManager.getCompetitors(
     'activities/steps',
     '2017-04-01',
     '2017-04-07',
@@ -51,11 +51,6 @@ app.get('/fitbit-callback', async (req, res) => {
   console.log('Need to add new client to client manager');
   fitbitClientManager.addClient(client);
   res.redirect('/');
-});
-
-app.get('/profile', async (req, res) => {
-  const profiles: Array<Object> = await fitbitClientManager.getAllProfiles();
-  res.json(profiles);
 });
 
 app.listen(app.get('port'), async () => {

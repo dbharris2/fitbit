@@ -53,26 +53,17 @@ export default class FitbitClientManager {
     });
   }
 
-  async getAllActivityTimeSeries(
+  async getCompetitors(
     resourcePath: string,
     baseDate: string,
     endDate: string,
   ): Promise<Array<Object>> {
     const activityTimeSeriesPromises: Array<Promise<Object>> = this.clients.map(
       (client: FitbitClient) => {
-        return client.getActivityTimeSeries(resourcePath, baseDate, endDate);
+        return client.getCompetitors(resourcePath, baseDate, endDate);
       },
     );
     return await Promise.all(activityTimeSeriesPromises);
-  }
-
-  async getAllProfiles(): Promise<Array<Object>> {
-    const profilePromises: Array<Promise<Object>> = this.clients.map(
-      (client: FitbitClient) => {
-        return client.getProfile();
-      },
-    );
-    return await Promise.all(profilePromises);
   }
 
   saveClients() {

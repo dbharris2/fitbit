@@ -64,6 +64,27 @@ export default class FitbitClient {
     }
   }
 
+  async getCompetitors(
+    resourcePath: string,
+    baseDate: string,
+    endDate: string,
+  ): Promise<Object> {
+    const activityTimeSeriesPromise: Promise<Object> = this.getActivityTimeSeries(
+      resourcePath,
+      baseDate,
+      endDate,
+    );
+    const profilePromise: Promise<Object> = this.getProfile();
+    const [activityTimeSeries, profile]: Array<Object> = await Promise.all([
+      activityTimeSeriesPromise,
+      profilePromise,
+    ]);
+    return {
+      activityTimeSeries: activityTimeSeries,
+      profile: profile,
+    };
+  }
+
   /**
    * See {@link https://dev.fitbit.com/docs/oauth2/ Fitbit Authorization Documentation}
    * for more information
