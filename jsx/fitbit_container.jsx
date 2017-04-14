@@ -22,6 +22,7 @@ type Profile = {
 type FitbitCompetitor = {
   activityTimeSeries: Object,
   profile: Profile,
+  totalActivityTimeSeries: Object,
 };
 
 type FitbitContainerProps = {};
@@ -29,12 +30,10 @@ type FitbitContainerProps = {};
 function _renderActivityTimeSeries(
   competitors: Array<FitbitCompetitor>,
 ): Array<Object> {
-  return competitors.map((competitor: Object) => {
+  return competitors.map((competitor: FitbitCompetitor) => {
     return (
       <CompetitorStory
-        data={competitor.activityTimeSeries['activities-steps'].map(steps => {
-          return [steps.dateTime, steps.value];
-        })}
+        data={competitor.activityTimeSeries}
         imageUri={competitor.profile.user.avatar}
         key={competitor.profile.user.displayName}
         size={80}
@@ -57,7 +56,7 @@ function renderActivityTimeSeries(
 function _renderCompetitors(
   competitors: Array<FitbitCompetitor>,
 ): Array<Object> {
-  return competitors.map((competitor: Object) => {
+  return competitors.map((competitor: FitbitCompetitor) => {
     return (
       <Flexbox flexDirection="row" key={competitor.profile.user.displayName}>
         <Competitor
@@ -83,17 +82,9 @@ function renderCompetitors(
 function _formatCompetitorsActivityTimeSeriesData(
   competitors: Array<FitbitCompetitor>,
 ): Array<Object> {
-  const totalData: Array<Object> = competitors.map((competitor: Object) => {
-    const activityTimeSeriesUserData: Object = {};
-    competitor.activityTimeSeries['activities-steps'].forEach(steps => {
-      activityTimeSeriesUserData[steps.dateTime] = steps.value;
-    });
-    return {
-      name: competitor.profile.user.displayName,
-      data: activityTimeSeriesUserData,
-    };
+  return competitors.map((competitor: FitbitCompetitor) => {
+    return competitor.totalActivityTimeSeries;
   });
-  return totalData;
 }
 
 function formatCompetitorsActivityTimeSeriesData(

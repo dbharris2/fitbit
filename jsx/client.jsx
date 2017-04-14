@@ -77,9 +77,26 @@ export default class FitbitClient {
       activityTimeSeriesPromise,
       profilePromise,
     ]);
+
+    const formattedActivityTimeSeries: Array<Array<String>> = activityTimeSeries[
+      'activities-steps'
+    ].map((steps: Object) => {
+      return [steps.dateTime, steps.value];
+    });
+
+    const totalActivityTimeSeriesUserData: Object = {};
+    var totalSteps = 0;
+    activityTimeSeries['activities-steps'].forEach((steps: Object) => {
+      totalSteps += parseInt(steps.value);
+      totalActivityTimeSeriesUserData[steps.dateTime] = totalSteps;
+    });
     return {
-      activityTimeSeries: activityTimeSeries,
+      activityTimeSeries: formattedActivityTimeSeries,
       profile: profile,
+      totalActivityTimeSeries: {
+        name: profile.user.displayName,
+        data: totalActivityTimeSeriesUserData,
+      },
     };
   }
 
