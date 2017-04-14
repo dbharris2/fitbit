@@ -97,6 +97,7 @@ export default class FitbitClient {
         name: profile.user.displayName,
         data: totalActivityTimeSeriesUserData,
       },
+      totalSteps: totalSteps.toString(),
     };
   }
 
