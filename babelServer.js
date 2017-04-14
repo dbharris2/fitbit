@@ -48,7 +48,6 @@ app.get('/fitbit-callback', async (req, res) => {
     req.query.code,
     FITBIT_AUTHORIZATION_CALLBACK_URL,
   );
-  console.log('Need to add new client to client manager');
   fitbitClientManager.addClient(client);
   res.redirect('/');
 });

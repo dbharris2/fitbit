@@ -25,25 +25,22 @@ export default class FitbitClientManager {
   addClient(fitbitClient: FitbitClient): void {
     assert(fitbitClient != null);
 
-    console.log('Adding a new fitbit client for user id');
-    console.log(fitbitClient.getAccessTokenInfo().getUserId());
     var inserted = false;
     this.clients.forEach((client: FitbitClient) => {
-      console.log(client.getAccessTokenInfo().getUserId());
       if (
         fitbitClient.getAccessTokenInfo().getUserId() ===
         client.getAccessTokenInfo().getUserId()
       ) {
         client.replaceAccessTokenInfo(fitbitClient.getAccessTokenInfo());
         inserted = true;
-        console.log('Replaced client');
       }
     });
 
     if (!inserted) {
       this.clients.push(fitbitClient);
-      console.log('Pushed a new client');
     }
+
+    this.saveClients();
   }
 
   addClients(fitbitClients: Array<FitbitClient>): void {
@@ -67,7 +64,6 @@ export default class FitbitClientManager {
   }
 
   saveClients() {
-    console.log('Saving clients');
     const accessTokenInfos: Object = {access_tokens: []};
     const accessTokens: Array<Object> = accessTokenInfos['access_tokens'];
 
@@ -81,7 +77,6 @@ export default class FitbitClientManager {
     });
 
     if (accessTokens.length > 0) {
-      console.log(accessTokenInfos);
       fs.writeFile(ACCESS_TOKEN_FILE, JSON.stringify(accessTokenInfos));
     }
   }
