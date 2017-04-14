@@ -10,95 +10,114 @@ import {LineChart} from 'react-chartkick';
 import Competitor from './competitor';
 import CompetitorStory from './competitor_story';
 
+type User = {
+  avatar: string,
+  displayName: string,
+};
+
+type Profile = {
+  user: User,
+};
+
+type FitbitCompetitor = {
+  activityTimeSeries: Object,
+  profile: Profile,
+};
+
 type FitbitContainerProps = {};
 
-function renderActivityTimeSeries(
-  activityTimeSeries: ?Array<Object>,
-  user: Object,
-) {
-  return activityTimeSeries == null || user == null
-    ? null
-    : activityTimeSeries.map((ats: Object) => {
-        return (
-          <CompetitorStory
-            data={ats['activities-steps'].map(steps => {
-              return [steps.dateTime, steps.value];
-            })}
-            imageUri={user.avatar}
-            size={80}
-            style={{
-              marginBottom: '10px',
-              padding: '10px',
-            }}
-            title={user.displayName}
-          />
-        );
-      });
-}
-
-function renderCompetitors(users: ?Array<Object>) {
-  return users == null
-    ? null
-    : users.map((user: Object) => {
-        return (
-          <div key={user.displayName}>
-            <Competitor
-              imageUri={user.avatar}
-              size={80}
-              subtitle={null}
-              title={user.displayName}
-            />
-          </div>
-        );
-      });
-}
-
-function formatAllCompetitorsActivityTimeSeriesData(
-  activityTimeSeriesData: Array<Object>,
+function _renderActivityTimeSeries(
+  competitors: Array<FitbitCompetitor>,
 ): Array<Object> {
-  const totalData: Array<Object> = activityTimeSeriesData.map(
-    (activityTimeSeries: Object) => {
-      const activityTimeSeriesUserData: Object = {};
-      activityTimeSeries['activities-steps'].forEach(steps => {
-        activityTimeSeriesUserData[steps.dateTime] = steps.value;
-      });
-      return {
-        name: 'Name of User',
-        data: activityTimeSeriesUserData,
-      };
-    },
-  );
+  return competitors.map((competitor: Object) => {
+    return (
+      <CompetitorStory
+        data={competitor.activityTimeSeries['activities-steps'].map(steps => {
+          return [steps.dateTime, steps.value];
+        })}
+        imageUri={competitor.profile.user.avatar}
+        size={80}
+        style={{
+          marginBottom: '10px',
+          padding: '10px',
+        }}
+        title={competitor.profile.user.displayName}
+      />
+    );
+  });
+}
+
+function renderActivityTimeSeries(
+  competitors: ?Array<FitbitCompetitor>,
+): ?Array<Object> {
+  return competitors == null ? null : _renderActivityTimeSeries(competitors);
+}
+
+function _renderCompetitors(
+  competitors: Array<FitbitCompetitor>,
+): Array<Object> {
+  return competitors.map((competitor: Object) => {
+    return (
+      <div key={competitor.profile.user.displayName}>
+        <Competitor
+          imageUri={competitor.profile.user.avatar}
+          size={80}
+          subtitle={null}
+          title={competitor.profile.user.displayName}
+        />
+      </div>
+    );
+  });
+}
+
+function renderCompetitors(
+  competitors: ?Array<FitbitCompetitor>,
+): ?Array<Object> {
+  return competitors == null ? null : _renderCompetitors(competitors);
+}
+
+function _formatCompetitorsActivityTimeSeriesData(
+  competitors: Array<FitbitCompetitor>,
+): Array<Object> {
+  const totalData: Array<Object> = competitors.map((competitor: Object) => {
+    const activityTimeSeriesUserData: Object = {};
+    competitor.activityTimeSeries['activities-steps'].forEach(steps => {
+      activityTimeSeriesUserData[steps.dateTime] = steps.value;
+    });
+    return {
+      name: competitor.profile.user.displayName,
+      data: activityTimeSeriesUserData,
+    };
+  });
   return totalData;
+}
+
+function formatCompetitorsActivityTimeSeriesData(
+  competitors: ?Array<FitbitCompetitor>,
+): ?Array<Object> {
+  return competitors == null
+    ? null
+    : _formatCompetitorsActivityTimeSeriesData(competitors);
 }
 
 export default class FitbitContainer extends React.Component {
   props: FitbitContainerProps;
 
   state: {
-    activityTimeSeries: ?Array<Object>,
-    users: ?Array<Object>,
+    competitors: ?Array<Object>,
   };
 
   constructor(props: FitbitContainerProps): void {
     super(props);
     this.state = {
-      activityTimeSeries: null,
-      users: null,
+      competitors: null,
     };
   }
 
   componentDidMount(): void {
-    axios.get('/activity-time-series').then(response => {
+    axios.get('/competitors').then(response => {
       this.setState({
-        activityTimeSeries: response.data,
-      });
-    });
-
-    axios.get('/profile').then(response => {
-      this.setState({
-        users: response.data.map((userWrapper: Object) => {
-          return userWrapper.user;
-        }),
+        competitors: response.data,
       });
     });
   }
@@ -111,7 +130,7 @@ export default class FitbitContainer extends React.Component {
         </Flexbox>
 
         <Flexbox flexDirection="row" justifyContent="space-around">
-          {renderCompetitors(this.state.users)}
+          {renderCompetitors(this.state.competitors)}
         </Flexbox>
 
         <Flexbox alignItems="stretch" flexDirection="column" paddingTop="40px">
@@ -123,12 +142,12 @@ export default class FitbitContainer extends React.Component {
           />
 
           <Paper style={{marginBottom: '10px', padding: '10px'}}>
-            {this.state.activityTimeSeries == null
+            {this.state.competitors == null
               ? null
               : <div>
                   <LineChart
-                    data={formatAllCompetitorsActivityTimeSeriesData(
-                      this.state.activityTimeSeries,
+                    data={formatCompetitorsActivityTimeSeriesData(
+                      this.state.competitors,
                     )}
                     xtitle={'Date'}
                     ytitle={'Steps'}
@@ -136,12 +155,7 @@ export default class FitbitContainer extends React.Component {
                 </div>}
           </Paper>
 
-          {this.state.users == null
-            ? null
-            : renderActivityTimeSeries(
-                this.state.activityTimeSeries,
-                this.state.users[0],
-              )}
+          {renderActivityTimeSeries(this.state.competitors)}
         </Flexbox>
       </Flexbox>
     );
