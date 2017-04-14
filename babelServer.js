@@ -29,7 +29,7 @@ app.get('/competitors', async (req, res) => {
   const allActivityTimeSeries: Array<Object> = await fitbitClientManager.getCompetitors(
     'activities/steps',
     '2017-04-01',
-    '2017-04-07',
+    getYesterdayString(),
   );
   res.json(allActivityTimeSeries);
 });
@@ -60,7 +60,33 @@ app.listen(app.get('port'), async () => {
   console.log('Server started: http://localhost:' + app.get('port') + '/');
 });
 
+function addZeroIfLessThanTen(value: number): string {
+  return value < 10 ? '0' : '';
+}
+
 async function createFitbitClient() {
   const fitbitApp: FitbitApp = await AppLoader.loadAppData();
   return new FitbitClient(fitbitApp, fitbitClientManager);
+}
+
+function getYesterdayDate(today: Date): string {
+  const date: number = today.getDate() - 1;
+  return addZeroIfLessThanTen(date) + date;
+}
+
+function getYesterdayMonth(today: Date): string {
+  const month: number = today.getMonth() + 1;
+  return addZeroIfLessThanTen(month) + month;
+}
+
+function getYesterdayString(): string {
+  const today: Date = new Date();
+  const month: number = today.getMonth() + 1;
+  const date: number = today.getDate() - 1;
+  const yesterday: string = today.getFullYear() +
+    '-' +
+    getYesterdayMonth(today) +
+    '-' +
+    getYesterdayDate(today);
+  return yesterday;
 }
