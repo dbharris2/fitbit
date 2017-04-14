@@ -38,8 +38,6 @@ export default class FitbitClient {
       code,
       callbackUrl,
     );
-    console.log('Setting access token info via authentication');
-    console.log(accessTokenInfo);
     this.setAccessTokenInfo(accessTokenInfo);
   }
 
@@ -118,8 +116,6 @@ export default class FitbitClient {
   setAccessTokenInfo(accessTokenInfo: Object): void {
     assert(accessTokenInfo != null);
     this.accessTokenInfo = AccessTokenInfo.fromJson(accessTokenInfo);
-    console.log('setAccessTokenInfo');
-    console.log(this.accessTokenInfo);
     this.clientManager.saveClients();
   }
 
@@ -150,7 +146,6 @@ export default class FitbitClient {
 
   static _isAccessTokenExpired(response: Object): boolean {
     assert(response != null);
-    console.log('Error: ' + response.errors[0].errorType);
     return response.errors[0].errorType === 'expired_token';
   }
 
@@ -159,19 +154,16 @@ export default class FitbitClient {
    * for more information
    */
   async _refreshAccessToken(): Promise<void> {
-    console.log('Refreshing access token');
     const accessTokenInfo: Object = await this.client.refreshAccessToken(
       this.accessTokenInfo.accessToken,
       this.accessTokenInfo.refreshToken,
       -1,
     );
-    console.log(accessTokenInfo);
     this.setAccessTokenInfo(accessTokenInfo);
   }
 
   async _refreshAccessTokenIfNeeded(response: Object): Promise<boolean> {
     if (FitbitClient._isAccessTokenExpired(response)) {
-      console.log('Access token is expired, need to refresh');
       await this._refreshAccessToken();
       return true;
     } else {
