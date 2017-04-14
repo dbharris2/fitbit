@@ -9,12 +9,13 @@ export default function Competitor(
   props: {
     imageUri: string,
     size: number,
+    style: ?Object,
     subtitle: ?string,
     title: string,
   },
 ) {
   return (
-    <Flexbox alignItems="center" flexDirection="row">
+    <Flexbox alignItems="center" flexDirection="row" style={props.style}>
       <Avatar
         backgroundColor={transparent}
         size={props.size}

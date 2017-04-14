@@ -36,6 +36,7 @@ function _renderActivityTimeSeries(
           return [steps.dateTime, steps.value];
         })}
         imageUri={competitor.profile.user.avatar}
+        key={competitor.profile.user.displayName}
         size={80}
         style={{
           marginBottom: '10px',
@@ -58,14 +59,17 @@ function _renderCompetitors(
 ): Array<Object> {
   return competitors.map((competitor: Object) => {
     return (
-      <div key={competitor.profile.user.displayName}>
+      <Flexbox flexDirection="row" key={competitor.profile.user.displayName}>
         <Competitor
           imageUri={competitor.profile.user.avatar}
           size={80}
           subtitle={null}
+          style={{
+            marginBottom: '30px',
+          }}
           title={competitor.profile.user.displayName}
         />
-      </div>
+      </Flexbox>
     );
   });
 }
@@ -129,7 +133,7 @@ export default class FitbitContainer extends React.Component {
           <h1>2017 Fitbit Competition</h1>
         </Flexbox>
 
-        <Flexbox flexDirection="row" justifyContent="space-around">
+        <Flexbox alignItems="center" flexDirection="column">
           {renderCompetitors(this.state.competitors)}
         </Flexbox>
 
