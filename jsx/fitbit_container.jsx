@@ -127,14 +127,16 @@ export default class FitbitContainer extends React.Component {
 
   state: {
     competitors: ?Array<FitbitCompetitor>,
-    selectedCompetitors: ?Array<FitbitCompetitor>,
+    selectedDailyActivityTimeSeriesCompetitors: ?Array<FitbitCompetitor>,
+    selectedTotalActivityTimeSeriesCompetitors: ?Array<FitbitCompetitor>,
   };
 
   constructor(props: FitbitContainerProps): void {
     super(props);
     this.state = {
       competitors: null,
-      selectedCompetitors: null,
+      selectedDailyActivityTimeSeriesCompetitors: null,
+      selectedTotalActivityTimeSeriesCompetitors: null,
     };
   }
 
@@ -142,7 +144,8 @@ export default class FitbitContainer extends React.Component {
     axios.get('/competitors').then(response => {
       this.setState({
         competitors: response.data,
-        selectedCompetitors: response.data,
+        selectedDailyActivityTimeSeriesCompetitors: response.data,
+        selectedTotalActivityTimeSeriesCompetitors: response.data,
       });
     });
   }
@@ -167,11 +170,11 @@ export default class FitbitContainer extends React.Component {
         />
 
         <Paper style={{marginBottom: '10px', padding: '10px'}}>
-          {this.state.competitors == null
+          {this.state.selectedTotalActivityTimeSeriesCompetitors == null
             ? null
             : <LineChart
                 data={formatCompetitorsActivityTimeSeriesData(
-                  this.state.selectedCompetitors,
+                  this.state.selectedTotalActivityTimeSeriesCompetitors,
                 )}
                 xtitle={'Date'}
                 ytitle={'Steps'}
@@ -184,9 +187,41 @@ export default class FitbitContainer extends React.Component {
               competitors={this.state.competitors}
               onToggle={(userId: string, isChecked: boolean) => {
                 this.setState({
-                  selectedCompetitors: updateSelectedCompetitors(
+                  selectedTotalActivityTimeSeriesCompetitors: updateSelectedCompetitors(
                     this.state.competitors,
-                    this.state.selectedCompetitors,
+                    this.state.selectedTotalActivityTimeSeriesCompetitors,
+                    userId,
+                    isChecked,
+                  ),
+                });
+              }}
+              style={null}
+            />}
+
+        {this.state.selectedDailyActivityTimeSeriesCompetitors == null
+          ? null
+          : <LineChart
+              data={this.state.selectedDailyActivityTimeSeriesCompetitors.map(
+                (competitor: FitbitCompetitor) => {
+                  return {
+                    name: competitor.profile.user.displayName,
+                    data: competitor.activityTimeSeries,
+                  };
+                },
+              )}
+              xtitle={'Date'}
+              ytitle={'Steps'}
+            />}
+
+        {this.state.competitors == null
+          ? null
+          : <CompetitorToggles
+              competitors={this.state.competitors}
+              onToggle={(userId: string, isChecked: boolean) => {
+                this.setState({
+                  selectedDailyActivityTimeSeriesCompetitors: updateSelectedCompetitors(
+                    this.state.competitors,
+                    this.state.selectedDailyActivityTimeSeriesCompetitors,
                     userId,
                     isChecked,
                   ),
