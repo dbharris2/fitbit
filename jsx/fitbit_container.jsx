@@ -152,7 +152,13 @@ export default class FitbitContainer extends React.Component {
 
   render() {
     return (
-      <Flexbox alignItems="stretch" flexDirection="column">
+      <Flexbox
+        alignItems="stretch"
+        flexDirection="column"
+        style={{
+          overflow: 'hidden',
+        }}
+      >
         <Header
           style={{
             backgroundColor: '#EEEEEE',
