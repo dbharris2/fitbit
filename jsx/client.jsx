@@ -62,7 +62,7 @@ export default class FitbitClient {
     }
   }
 
-  async getCompetitors(
+  async getCompetitor(
     resourcePath: string,
     baseDate: string,
     endDate: string,

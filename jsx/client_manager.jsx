@@ -55,12 +55,12 @@ export default class FitbitClientManager {
     baseDate: string,
     endDate: string,
   ): Promise<Array<Object>> {
-    const activityTimeSeriesPromises: Array<Promise<Object>> = this.clients.map(
+    const competitorPromises: Array<Promise<Object>> = this.clients.map(
       (client: FitbitClient) => {
-        return client.getCompetitors(resourcePath, baseDate, endDate);
+        return client.getCompetitor(resourcePath, baseDate, endDate);
       },
     );
-    return await Promise.all(activityTimeSeriesPromises);
+    return await Promise.all(competitorPromises);
   }
 
   saveClients() {

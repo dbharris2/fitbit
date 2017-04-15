@@ -9,22 +9,8 @@ import {LineChart} from 'react-chartkick';
 
 import Competitor from './competitor';
 import CompetitorStory from './competitor_story';
-
-type User = {
-  avatar: string,
-  displayName: string,
-};
-
-type Profile = {
-  user: User,
-};
-
-type FitbitCompetitor = {
-  activityTimeSeries: Object,
-  profile: Profile,
-  totalActivityTimeSeries: Object,
-  totalSteps: string,
-};
+import CompetitorToggles from './competitor_toggles';
+import type {FitbitCompetitor} from './fitbit_competitor';
 
 type FitbitContainerProps = {};
 
@@ -95,17 +81,60 @@ function formatCompetitorsActivityTimeSeriesData(
     : _formatCompetitorsActivityTimeSeriesData(competitors);
 }
 
+function _updateSelectedCompetitors(
+  competitors: Array<FitbitCompetitor>,
+  selectedCompetitors: Array<FitbitCompetitor>,
+  userId: string,
+  isChecked: boolean,
+): Array<FitbitCompetitor> {
+  if (isChecked) {
+    competitors.forEach((competitor: FitbitCompetitor) => {
+      if (competitor.profile.user.encodedId === userId) {
+        selectedCompetitors.push(competitor);
+      }
+    });
+    return selectedCompetitors;
+  } else {
+    const result = selectedCompetitors.filter(
+      (competitor: FitbitCompetitor) => {
+        return competitor.profile.user.encodedId !== userId;
+      },
+    );
+    return result;
+  }
+}
+
+function updateSelectedCompetitors(
+  competitors: ?Array<FitbitCompetitor>,
+  selectedCompetitors: ?Array<FitbitCompetitor>,
+  userId: string,
+  isChecked: boolean,
+): ?Array<FitbitCompetitor> {
+  if (competitors == null || selectedCompetitors == null) {
+    return null;
+  } else {
+    return _updateSelectedCompetitors(
+      competitors,
+      selectedCompetitors,
+      userId,
+      isChecked,
+    );
+  }
+}
+
 export default class FitbitContainer extends React.Component {
   props: FitbitContainerProps;
 
   state: {
-    competitors: ?Array<Object>,
+    competitors: ?Array<FitbitCompetitor>,
+    selectedCompetitors: ?Array<FitbitCompetitor>,
   };
 
   constructor(props: FitbitContainerProps): void {
     super(props);
     this.state = {
       competitors: null,
+      selectedCompetitors: null,
     };
   }
 
@@ -113,6 +142,7 @@ export default class FitbitContainer extends React.Component {
     axios.get('/competitors').then(response => {
       this.setState({
         competitors: response.data,
+        selectedCompetitors: response.data,
       });
     });
   }
@@ -141,12 +171,29 @@ export default class FitbitContainer extends React.Component {
             ? null
             : <LineChart
                 data={formatCompetitorsActivityTimeSeriesData(
-                  this.state.competitors,
+                  this.state.selectedCompetitors,
                 )}
                 xtitle={'Date'}
                 ytitle={'Steps'}
               />}
         </Paper>
+
+        {this.state.competitors == null
+          ? null
+          : <CompetitorToggles
+              competitors={this.state.competitors}
+              onToggle={(userId: string, isChecked: boolean) => {
+                this.setState({
+                  selectedCompetitors: updateSelectedCompetitors(
+                    this.state.competitors,
+                    this.state.selectedCompetitors,
+                    userId,
+                    isChecked,
+                  ),
+                });
+              }}
+              style={null}
+            />}
 
         {renderActivityTimeSeries(this.state.competitors)}
       </Flexbox>
