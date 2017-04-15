@@ -1,8 +1,6 @@
 /* @flow */
 
 import Flexbox from 'flexbox-react';
-import Paper from 'material-ui/Paper';
-import RaisedButton from 'material-ui/RaisedButton';
 import React from 'react';
 import axios from 'axios';
 import {LineChart} from 'react-chartkick';
@@ -11,6 +9,8 @@ import Competitor from './competitor';
 import CompetitorStory from './competitor_story';
 import CompetitorToggles from './competitor_toggles';
 import type {FitbitCompetitor} from './fitbit_competitor';
+import Header from './header';
+import Team from './team';
 
 type FitbitContainerProps = {};
 
@@ -50,6 +50,8 @@ function _renderCompetitors(
         key={competitor.profile.user.displayName}
         size={100}
         style={{
+          paddingLeft: '100px',
+          paddingRight: '100px',
           marginBottom: '30px',
         }}
         subtitle={'Total steps: ' + competitor.totalSteps}
@@ -122,6 +124,30 @@ function updateSelectedCompetitors(
   }
 }
 
+function getFirstHalfOfCompetitors(
+  competitors: Array<FitbitCompetitor>,
+): Array<FitbitCompetitor> {
+  var firstHalf: Array<FitbitCompetitor> = [];
+  for (var index = 0; index < competitors.length / 2; index++) {
+    firstHalf.push(competitors[index]);
+  }
+  return firstHalf;
+}
+
+function getLastHalfOfCompetitors(
+  competitors: Array<FitbitCompetitor>,
+): Array<FitbitCompetitor> {
+  var lastHalf: Array<FitbitCompetitor> = [];
+  for (
+    var index = competitors.length / 2;
+    index < competitors.length;
+    index++
+  ) {
+    lastHalf.push(competitors[index]);
+  }
+  return lastHalf;
+}
+
 export default class FitbitContainer extends React.Component {
   props: FitbitContainerProps;
 
@@ -153,33 +179,53 @@ export default class FitbitContainer extends React.Component {
   render() {
     return (
       <Flexbox alignItems="stretch" flexDirection="column">
-
-        <Flexbox flexDirection="row" justifyContent="center">
-          <h1>2017 Fitbit Competition</h1>
-        </Flexbox>
-
-        <Flexbox alignItems="center" flexDirection="column">
-          {renderCompetitors(this.state.competitors)}
-        </Flexbox>
-
-        <RaisedButton
-          href="/authenticate"
-          label="Join the Fun!"
-          primary={true}
-          style={{margin: 12}}
+        <Header
+          style={{
+            backgroundColor: '#EEEEEE',
+            height: '200px',
+            paddingLeft: '100px',
+            paddingRight: '100px',
+            marginBottom: '40px',
+          }}
         />
 
-        <Paper style={{marginBottom: '10px', padding: '10px'}}>
-          {this.state.selectedTotalActivityTimeSeriesCompetitors == null
-            ? null
-            : <LineChart
-                data={formatCompetitorsActivityTimeSeriesData(
-                  this.state.selectedTotalActivityTimeSeriesCompetitors,
-                )}
-                xtitle={'Date'}
-                ytitle={'Steps'}
-              />}
-        </Paper>
+        <Flexbox
+          flexDirection="row"
+          flexWrap="wrap"
+          justifyContent="space-around"
+          style={{
+            marginBottom: '30px',
+          }}
+        >
+          <Flexbox flexDirection="column">
+            {this.state.competitors == null
+              ? null
+              : <Team
+                  competitors={getFirstHalfOfCompetitors(
+                    this.state.competitors,
+                  )}
+                  name="Team 1"
+                />}
+          </Flexbox>
+          <Flexbox flexDirection="column">
+            {this.state.competitors == null
+              ? null
+              : <Team
+                  competitors={getLastHalfOfCompetitors(this.state.competitors)}
+                  name="Team 2"
+                />}
+          </Flexbox>
+        </Flexbox>
+
+        {this.state.selectedTotalActivityTimeSeriesCompetitors == null
+          ? null
+          : <LineChart
+              data={formatCompetitorsActivityTimeSeriesData(
+                this.state.selectedTotalActivityTimeSeriesCompetitors,
+              )}
+              xtitle={'Date'}
+              ytitle={'Steps'}
+            />}
 
         {this.state.competitors == null
           ? null
@@ -195,7 +241,9 @@ export default class FitbitContainer extends React.Component {
                   ),
                 });
               }}
-              style={null}
+              style={{
+                marginBottom: '30px',
+              }}
             />}
 
         {this.state.selectedDailyActivityTimeSeriesCompetitors == null
@@ -227,7 +275,9 @@ export default class FitbitContainer extends React.Component {
                   ),
                 });
               }}
-              style={null}
+              style={{
+                marginBottom: '30px',
+              }}
             />}
 
         {renderActivityTimeSeries(this.state.competitors)}

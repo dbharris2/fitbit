@@ -1,7 +1,6 @@
 /* @flow */
 
 import Avatar from 'material-ui/Avatar';
-import Paper from 'material-ui/Paper';
 import React from 'react';
 import {LineChart} from 'react-chartkick';
 
@@ -17,7 +16,7 @@ export default function CompetitorStory(
   },
 ) {
   return (
-    <Paper style={props.style}>
+    <div style={props.style}>
       <Competitor
         imageUri={props.imageUri}
         size={80}
@@ -29,6 +28,6 @@ export default function CompetitorStory(
         Steps/Day
       </h3>
       <LineChart data={props.data} xtitle={'Date'} ytitle={'Steps'} />
-    </Paper>
+    </div>
   );
 }
