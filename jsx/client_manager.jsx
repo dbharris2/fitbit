@@ -6,11 +6,36 @@ import path from 'path';
 
 import AccessTokenInfo from './access_token_info';
 import FitbitClient from './client';
+import type {FitbitCompetitor} from './fitbit_competitor';
 
 const ACCESS_TOKEN_FILE: string = path.join(
   __dirname,
   '../json/access_token.json',
 );
+
+function getTeamOneCompetitors(
+  competitors: Array<FitbitCompetitor>,
+): Array<FitbitCompetitor> {
+  return competitors.filter((competitor: FitbitCompetitor) => {
+    return competitor.profile.user.encodedId === '256YMG' ||
+      competitor.profile.user.encodedId === '2WMQDP' ||
+      competitor.profile.user.encodedId === '2Z8TC2' ||
+      competitor.profile.user.encodedId === '33694V' ||
+      competitor.profile.user.encodedId === '3C3F9G';
+  });
+}
+
+function getTeamTwoCompetitors(
+  competitors: Array<FitbitCompetitor>,
+): Array<FitbitCompetitor> {
+  return competitors.filter((competitor: FitbitCompetitor) => {
+    return competitor.profile.user.encodedId === '2XCGBN' ||
+      competitor.profile.user.encodedId === '4C7CC5' ||
+      competitor.profile.user.encodedId === '2WRBR6' ||
+      competitor.profile.user.encodedId === '4CBZRP' ||
+      competitor.profile.user.encodedId === 'Emma';
+  });
+}
 
 /**
  * Fetches data from each Fitbit client
@@ -54,13 +79,33 @@ export default class FitbitClientManager {
     resourcePath: string,
     baseDate: string,
     endDate: string,
-  ): Promise<Array<Object>> {
-    const competitorPromises: Array<Promise<Object>> = this.clients.map(
+  ): Promise<Array<FitbitCompetitor>> {
+    const competitorPromises: Array<Promise<FitbitCompetitor>> = this.clients.map(
       (client: FitbitClient) => {
         return client.getCompetitor(resourcePath, baseDate, endDate);
       },
     );
     return await Promise.all(competitorPromises);
+  }
+
+  async getCompetition(
+    resourcePath: string,
+    baseDate: string,
+    endDate: string,
+  ): Promise<Object> {
+    const competitors: Array<FitbitCompetitor> = await this.getCompetitors(
+      resourcePath,
+      baseDate,
+      endDate,
+    );
+
+    return {
+      competitors: competitors,
+      teams: [
+        getTeamOneCompetitors(competitors),
+        getTeamTwoCompetitors(competitors),
+      ],
+    };
   }
 
   saveClients() {

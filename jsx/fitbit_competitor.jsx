@@ -16,3 +16,8 @@ export type FitbitCompetitor = {
   totalActivityTimeSeries: Object,
   totalSteps: string,
 };
+
+export type FitbitCompetition = {
+  competitors: Array<FitbitCompetitor>,
+  teams: Array<Array<FitbitCompetitor>>,
+};
