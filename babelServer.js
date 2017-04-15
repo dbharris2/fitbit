@@ -25,13 +25,13 @@ app.get('/', (req, res) => {
   res.sendFile(path.resolve(__dirname + './public/index.html'));
 });
 
-app.get('/competitors', async (req, res) => {
-  const allActivityTimeSeries: Array<Object> = await fitbitClientManager.getCompetitors(
+app.get('/competition', async (req, res) => {
+  const competition: Object = await fitbitClientManager.getCompetition(
     'activities/steps',
     '2017-04-01',
     getYesterdayString(),
   );
-  res.json(allActivityTimeSeries);
+  res.json(competition);
 });
 
 app.get('/authenticate', async (req, res) => {

@@ -8,7 +8,7 @@ import {LineChart} from 'react-chartkick';
 import Competitor from './competitor';
 import CompetitorStory from './competitor_story';
 import CompetitorToggles from './competitor_toggles';
-import type {FitbitCompetitor} from './fitbit_competitor';
+import type {FitbitCompetition, FitbitCompetitor} from './fitbit_competitor';
 import Header from './header';
 import Team from './team';
 
@@ -96,30 +96,6 @@ function updateSelectedCompetitors(
   }
 }
 
-function getFirstHalfOfCompetitors(
-  competitors: Array<FitbitCompetitor>,
-): Array<FitbitCompetitor> {
-  var firstHalf: Array<FitbitCompetitor> = [];
-  for (var index = 0; index < competitors.length / 2; index++) {
-    firstHalf.push(competitors[index]);
-  }
-  return firstHalf;
-}
-
-function getLastHalfOfCompetitors(
-  competitors: Array<FitbitCompetitor>,
-): Array<FitbitCompetitor> {
-  var lastHalf: Array<FitbitCompetitor> = [];
-  for (
-    var index = competitors.length / 2;
-    index < competitors.length;
-    index++
-  ) {
-    lastHalf.push(competitors[index]);
-  }
-  return lastHalf;
-}
-
 type FitbitContainerProps = {};
 
 export default class FitbitContainer extends React.Component {
@@ -129,6 +105,7 @@ export default class FitbitContainer extends React.Component {
     competitors: ?Array<FitbitCompetitor>,
     selectedDailyActivityTimeSeriesCompetitors: ?Array<FitbitCompetitor>,
     selectedTotalActivityTimeSeriesCompetitors: ?Array<FitbitCompetitor>,
+    teams: ?Array<Array<FitbitCompetitor>>,
   };
 
   constructor(props: FitbitContainerProps): void {
@@ -137,15 +114,18 @@ export default class FitbitContainer extends React.Component {
       competitors: null,
       selectedDailyActivityTimeSeriesCompetitors: null,
       selectedTotalActivityTimeSeriesCompetitors: null,
+      teams: null,
     };
   }
 
   componentDidMount(): void {
-    axios.get('/competitors').then(response => {
+    axios.get('/competition').then(response => {
+      const competition: FitbitCompetition = response.data;
       this.setState({
-        competitors: response.data,
-        selectedDailyActivityTimeSeriesCompetitors: response.data,
-        selectedTotalActivityTimeSeriesCompetitors: response.data,
+        competitors: competition.competitors,
+        selectedDailyActivityTimeSeriesCompetitors: competition.competitors,
+        selectedTotalActivityTimeSeriesCompetitors: competition.competitors,
+        teams: competition.teams,
       });
     });
   }
@@ -177,24 +157,16 @@ export default class FitbitContainer extends React.Component {
             marginBottom: '30px',
           }}
         >
-          <Flexbox flexDirection="column">
-            {this.state.competitors == null
-              ? null
-              : <Team
-                  competitors={getFirstHalfOfCompetitors(
-                    this.state.competitors,
-                  )}
-                  name="Team 1"
-                />}
-          </Flexbox>
-          <Flexbox flexDirection="column">
-            {this.state.competitors == null
-              ? null
-              : <Team
-                  competitors={getLastHalfOfCompetitors(this.state.competitors)}
-                  name="Team 2"
-                />}
-          </Flexbox>
+
+          {this.state.teams == null
+            ? null
+            : this.state.teams.map((competitors: Array<FitbitCompetitor>) => {
+                return (
+                  <Flexbox flexDirection="column">
+                    <Team competitors={competitors} name="Team Name" />
+                  </Flexbox>
+                );
+              })}
         </Flexbox>
 
         <Flexbox alignItems="center" flexDirection="column">
