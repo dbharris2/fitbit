@@ -12,34 +12,6 @@ import type {FitbitCompetitor} from './fitbit_competitor';
 import Header from './header';
 import Team from './team';
 
-type FitbitContainerProps = {};
-
-function _renderActivityTimeSeries(
-  competitors: Array<FitbitCompetitor>,
-): Array<Object> {
-  return competitors.map((competitor: FitbitCompetitor) => {
-    return (
-      <CompetitorStory
-        data={competitor.activityTimeSeries}
-        imageUri={competitor.profile.user.avatar}
-        key={competitor.profile.user.displayName}
-        size={80}
-        style={{
-          marginBottom: '10px',
-          padding: '10px',
-        }}
-        title={competitor.profile.user.displayName}
-      />
-    );
-  });
-}
-
-function renderActivityTimeSeries(
-  competitors: ?Array<FitbitCompetitor>,
-): ?Array<Object> {
-  return competitors == null ? null : _renderActivityTimeSeries(competitors);
-}
-
 function _renderCompetitors(
   competitors: Array<FitbitCompetitor>,
 ): Array<Object> {
@@ -148,6 +120,8 @@ function getLastHalfOfCompetitors(
   return lastHalf;
 }
 
+type FitbitContainerProps = {};
+
 export default class FitbitContainer extends React.Component {
   props: FitbitContainerProps;
 
@@ -217,15 +191,18 @@ export default class FitbitContainer extends React.Component {
           </Flexbox>
         </Flexbox>
 
-        {this.state.selectedTotalActivityTimeSeriesCompetitors == null
-          ? null
-          : <LineChart
-              data={formatCompetitorsActivityTimeSeriesData(
-                this.state.selectedTotalActivityTimeSeriesCompetitors,
-              )}
-              xtitle={'Date'}
-              ytitle={'Steps'}
-            />}
+        <Flexbox alignItems="center" flexDirection="column">
+          <h2>Total Steps/Day</h2>
+          {this.state.selectedTotalActivityTimeSeriesCompetitors == null
+            ? null
+            : <LineChart
+                data={formatCompetitorsActivityTimeSeriesData(
+                  this.state.selectedTotalActivityTimeSeriesCompetitors,
+                )}
+                xtitle={'Date'}
+                ytitle={'Steps'}
+              />}
+        </Flexbox>
 
         {this.state.competitors == null
           ? null
@@ -246,20 +223,23 @@ export default class FitbitContainer extends React.Component {
               }}
             />}
 
-        {this.state.selectedDailyActivityTimeSeriesCompetitors == null
-          ? null
-          : <LineChart
-              data={this.state.selectedDailyActivityTimeSeriesCompetitors.map(
-                (competitor: FitbitCompetitor) => {
-                  return {
-                    name: competitor.profile.user.displayName,
-                    data: competitor.activityTimeSeries,
-                  };
-                },
-              )}
-              xtitle={'Date'}
-              ytitle={'Steps'}
-            />}
+        <Flexbox alignItems="center" flexDirection="column">
+          <h2>Daily Steps/Day</h2>
+          {this.state.selectedDailyActivityTimeSeriesCompetitors == null
+            ? null
+            : <LineChart
+                data={this.state.selectedDailyActivityTimeSeriesCompetitors.map(
+                  (competitor: FitbitCompetitor) => {
+                    return {
+                      name: competitor.profile.user.displayName,
+                      data: competitor.activityTimeSeries,
+                    };
+                  },
+                )}
+                xtitle={'Date'}
+                ytitle={'Steps'}
+              />}
+        </Flexbox>
 
         {this.state.competitors == null
           ? null
@@ -275,12 +255,8 @@ export default class FitbitContainer extends React.Component {
                   ),
                 });
               }}
-              style={{
-                marginBottom: '30px',
-              }}
+              style={null}
             />}
-
-        {renderActivityTimeSeries(this.state.competitors)}
       </Flexbox>
     );
   }
