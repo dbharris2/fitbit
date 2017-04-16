@@ -126,7 +126,6 @@ export default class FitbitContainer extends React.Component {
   componentDidMount(): void {
     axios.get('/competition').then(response => {
       const competition: FitbitCompetition = response.data;
-      console.log(competition);
       this.setState({
         competitors: competition.competitors,
         selectedDailyActivityTimeSeriesCompetitors: competition.competitors,
