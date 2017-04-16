@@ -102,8 +102,14 @@ export default class FitbitClientManager {
     return {
       competitors: competitors,
       teams: [
-        getTeamOneCompetitors(competitors),
-        getTeamTwoCompetitors(competitors),
+        {
+          name: 'Team One',
+          competitors: getTeamOneCompetitors(competitors),
+        },
+        {
+          name: 'Team Two',
+          competitors: getTeamTwoCompetitors(competitors),
+        },
       ],
     };
   }
