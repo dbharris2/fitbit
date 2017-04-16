@@ -2,16 +2,14 @@
 
 import * as fs from 'async-file';
 import assert from 'assert';
+import mongodb from 'mongodb';
 import path from 'path';
 
 import AccessTokenInfo from './access_token_info';
+import AppLoader from './app_loader';
+import FitbitApp from './app';
 import FitbitClient from './client';
 import type {FitbitCompetitor} from './fitbit_competitor';
-
-const ACCESS_TOKEN_FILE: string = path.join(
-  __dirname,
-  '../json/access_token.json',
-);
 
 function getTeamOneCompetitors(
   competitors: Array<FitbitCompetitor>,
@@ -42,30 +40,25 @@ function getTeamTwoCompetitors(
  */
 export default class FitbitClientManager {
   clients: Array<FitbitClient>;
+  database: ?Object;
 
   constructor() {
     this.clients = [];
+    this.database = null;
   }
 
   addClient(fitbitClient: FitbitClient): void {
     assert(fitbitClient != null);
 
-    var inserted = false;
-    this.clients.forEach((client: FitbitClient) => {
-      if (
-        fitbitClient.getAccessTokenInfo().getUserId() ===
-        client.getAccessTokenInfo().getUserId()
-      ) {
-        client.replaceAccessTokenInfo(fitbitClient.getAccessTokenInfo());
-        inserted = true;
-      }
-    });
+    const localClient: ?FitbitClient = this._getClientWithUserId(
+      fitbitClient.getUserId(),
+    );
 
-    if (!inserted) {
-      this.clients.push(fitbitClient);
+    if (localClient == null) {
+      this._addClient(fitbitClient);
+    } else {
+      this.updateClient(fitbitClient);
     }
-
-    this.saveClients();
   }
 
   addClients(fitbitClients: Array<FitbitClient>): void {
@@ -73,6 +66,27 @@ export default class FitbitClientManager {
     fitbitClients.forEach((fitbitClient: FitbitClient) => {
       this.addClient(fitbitClient);
     });
+  }
+
+  async loadExistingClients(): Promise<void> {
+    if (this.database != null) {
+      this.database
+        .collection('users')
+        .find({})
+        .toArray(async (err: Object, docs: Array<Object>) => {
+          if (err) {
+            console.log(err);
+          } else {
+            const clients: Array<FitbitClient> = await this._transformJsonObjectsToFitbitClients(
+              docs,
+            );
+
+            clients.forEach((client: FitbitClient) => {
+              this.clients.push(client);
+            });
+          }
+        });
+    }
   }
 
   async getCompetitors(
@@ -114,21 +128,68 @@ export default class FitbitClientManager {
     };
   }
 
-  saveClients() {
-    const accessTokenInfos: Object = {access_tokens: []};
-    const accessTokens: Array<Object> = accessTokenInfos['access_tokens'];
+  setDatabase(database: Object) {
+    this.database = database;
+  }
 
-    this.clients.forEach((client: FitbitClient) => {
-      const accessTokenInfo: AccessTokenInfo = client.getAccessTokenInfo();
-      accessTokens.push({
-        access_token: accessTokenInfo.getAccessToken(),
-        refresh_token: accessTokenInfo.getRefreshToken(),
-        user_id: accessTokenInfo.getUserId(),
+  updateClient(client: FitbitClient): void {
+    console.log('Updating client: ' + client.getUserId());
+    if (this.database != null) {
+      this.database.collection('users').updateOne({
+        user_id: client.accessTokenInfo.getUserId(),
+      }, {
+        access_token: client.accessTokenInfo.getAccessToken(),
+        refresh_token: client.accessTokenInfo.getRefreshToken(),
+        user_id: client.accessTokenInfo.getUserId(),
+      }, (err, doc) => {
+        if (err) {
+          console.log(err);
+        }
+
+        const clientToUpdate: ?FitbitClient = this._getClientWithUserId(
+          client.getUserId(),
+        );
+        if (clientToUpdate) {
+          console.log(
+            'Replacing access token for client: ' + client.getUserId(),
+          );
+          clientToUpdate.replaceAccessTokenInfo(client.getAccessTokenInfo());
+        }
       });
-    });
-
-    if (accessTokens.length > 0) {
-      fs.writeFile(ACCESS_TOKEN_FILE, JSON.stringify(accessTokenInfos));
     }
+  }
+
+  _addClient(client: FitbitClient) {
+    console.log('Adding client: ' + client.getUserId());
+    if (this.database != null) {
+      this.database.collection('users').insertOne({
+        access_token: client.accessTokenInfo.getAccessToken(),
+        refresh_token: client.accessTokenInfo.getRefreshToken(),
+        user_id: client.accessTokenInfo.getUserId(),
+      }, (err, doc) => {
+        if (err) throw err;
+        this.clients.push(client);
+      });
+    }
+  }
+
+  _getClientWithUserId(userId: string): ?FitbitClient {
+    this.clients.forEach((client: FitbitClient) => {
+      if (userId === client.getAccessTokenInfo().getUserId()) {
+        return client;
+      }
+    });
+    return null;
+  }
+
+  async _transformJsonObjectsToFitbitClients(
+    jsonObjects: Array<Object>,
+  ): Promise<Array<FitbitClient>> {
+    const fitbitApp: FitbitApp = await AppLoader.loadAppData();
+    return jsonObjects.map((client: Object) => {
+      const fitbitClient: FitbitClient = new FitbitClient(fitbitApp, this);
+      fitbitClient._setAccessTokenInfo(client);
+      return fitbitClient;
+    });
   }
 }
