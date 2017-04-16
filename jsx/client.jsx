@@ -27,6 +27,10 @@ export default class FitbitClient {
     return this.accessTokenInfo;
   }
 
+  getUserId(): string {
+    return this.accessTokenInfo.userId;
+  }
+
   /**
    * See {@link https://dev.fitbit.com/docs/oauth2/#access-token-request Fitbit Access Token Request}
    * for more information
@@ -38,7 +42,7 @@ export default class FitbitClient {
       code,
       callbackUrl,
     );
-    this.setAccessTokenInfo(accessTokenInfo);
+    this._setAccessTokenInfo(accessTokenInfo);
   }
 
   /**
@@ -128,13 +132,13 @@ export default class FitbitClient {
 
   replaceAccessTokenInfo(accessTokenInfo: AccessTokenInfo): void {
     this.accessTokenInfo = accessTokenInfo;
-    this.clientManager.saveClients();
+    this.clientManager.updateClient(this);
   }
 
-  setAccessTokenInfo(accessTokenInfo: Object): void {
+  _setAccessTokenInfo(accessTokenInfo: Object): void {
     assert(accessTokenInfo != null);
     this.accessTokenInfo = AccessTokenInfo.fromJson(accessTokenInfo);
-    this.clientManager.saveClients();
+    this.clientManager.updateClient(this);
   }
 
   async _getActivityTimeSeries(
@@ -177,7 +181,7 @@ export default class FitbitClient {
       this.accessTokenInfo.refreshToken,
       -1,
     );
-    this.setAccessTokenInfo(accessTokenInfo);
+    this._setAccessTokenInfo(accessTokenInfo);
   }
 
   async _refreshAccessTokenIfNeeded(response: Object): Promise<boolean> {

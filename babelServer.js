@@ -2,17 +2,17 @@
 
 import * as fs from 'async-file';
 import express from 'express';
+import mongodb from 'mongodb';
 import path from 'path';
 
 import AppLoader from './jsx/app_loader';
 import FitbitApp from './jsx/app';
 import FitbitClient from './jsx/client';
-import FitbitClientLoader from './jsx/client_loader';
 import FitbitClientManager from './jsx/client_manager';
 
 require('babel-polyfill');
 
-const FITBIT_AUTHORIZATION_CALLBACK_URL: string = 'https://localhost:8080/fitbit-callback';
+const FITBIT_AUTHORIZATION_CALLBACK_URL: string = 'http://localhost:8080/fitbit-callback';
 
 const app: Object = express();
 
@@ -52,12 +52,19 @@ app.get('/fitbit-callback', async (req, res) => {
   res.redirect('/');
 });
 
-app.listen(app.get('port'), async () => {
-  const localFitbitClients: Array<FitbitClient> = await FitbitClientLoader.loadLocalClients(
-    fitbitClientManager,
-  );
-  fitbitClientManager.addClients(localFitbitClients);
-  console.log('Server started: http://localhost:' + app.get('port') + '/');
+mongodb.MongoClient.connect(process.env.MONGODB_URI, async (err, database) => {
+  if (err) {
+    console.log(err);
+    process.exit(1);
+  }
+
+  console.log('Database connection ready');
+  fitbitClientManager.setDatabase(database);
+  await fitbitClientManager.loadExistingClients();
+
+  app.listen(app.get('port'), async () => {
+    console.log('Server started: http://localhost:' + app.get('port') + '/');
+  });
 });
 
 function addZeroIfLessThanTen(value: number): string {
