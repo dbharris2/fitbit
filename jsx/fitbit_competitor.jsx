@@ -17,7 +17,12 @@ export type FitbitCompetitor = {
   totalSteps: string,
 };
 
+export type FitbitTeam = {
+  competitors: Array<FitbitCompetitor>,
+  name: string,
+};
+
 export type FitbitCompetition = {
   competitors: Array<FitbitCompetitor>,
-  teams: Array<Array<FitbitCompetitor>>,
+  teams: Array<FitbitTeam>,
 };

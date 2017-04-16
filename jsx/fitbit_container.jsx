@@ -8,9 +8,14 @@ import {LineChart} from 'react-chartkick';
 import Competitor from './competitor';
 import CompetitorStory from './competitor_story';
 import CompetitorToggles from './competitor_toggles';
-import type {FitbitCompetition, FitbitCompetitor} from './fitbit_competitor';
 import Header from './header';
 import Team from './team';
+
+import type {
+  FitbitCompetition,
+  FitbitCompetitor,
+  FitbitTeam,
+} from './fitbit_competitor';
 
 function _renderCompetitors(
   competitors: Array<FitbitCompetitor>,
@@ -105,7 +110,7 @@ export default class FitbitContainer extends React.Component {
     competitors: ?Array<FitbitCompetitor>,
     selectedDailyActivityTimeSeriesCompetitors: ?Array<FitbitCompetitor>,
     selectedTotalActivityTimeSeriesCompetitors: ?Array<FitbitCompetitor>,
-    teams: ?Array<Array<FitbitCompetitor>>,
+    teams: ?Array<FitbitTeam>,
   };
 
   constructor(props: FitbitContainerProps): void {
@@ -121,6 +126,7 @@ export default class FitbitContainer extends React.Component {
   componentDidMount(): void {
     axios.get('/competition').then(response => {
       const competition: FitbitCompetition = response.data;
+      console.log(competition);
       this.setState({
         competitors: competition.competitors,
         selectedDailyActivityTimeSeriesCompetitors: competition.competitors,
@@ -160,10 +166,10 @@ export default class FitbitContainer extends React.Component {
 
           {this.state.teams == null
             ? null
-            : this.state.teams.map((competitors: Array<FitbitCompetitor>) => {
+            : this.state.teams.map((team: FitbitTeam) => {
                 return (
                   <Flexbox flexDirection="column">
-                    <Team competitors={competitors} name="Team Name" />
+                    <Team competitors={team.competitors} name={team.name} />
                   </Flexbox>
                 );
               })}
