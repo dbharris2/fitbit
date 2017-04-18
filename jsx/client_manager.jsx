@@ -30,7 +30,7 @@ function getTeamTwoCompetitors(
     return competitor.profile.user.encodedId === '2XCGBN' ||
       competitor.profile.user.encodedId === '4C7CC5' ||
       competitor.profile.user.encodedId === '2WRBR6' ||
-      competitor.profile.user.encodedId === '4CBZRP' ||
+      competitor.profile.user.encodedId === '5MSHQS' ||
       competitor.profile.user.encodedId === '4BPPZQ';
   });
 }
