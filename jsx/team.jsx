@@ -18,7 +18,7 @@ export default function Team(
   return (
     <Flexbox justifyContent="center" flexDirection="column">
       <List>
-        <Subheader inset={true} style={{fontSize: '20px'}}>
+        <Subheader inset={false} style={{fontSize: '20px'}}>
           {props.name}
         </Subheader>
         {props.competitors.map((competitor: FitbitCompetitor) => {
