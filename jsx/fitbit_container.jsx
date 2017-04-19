@@ -168,7 +168,10 @@ export default class FitbitContainer extends React.Component {
             : this.state.teams.map((team: FitbitTeam) => {
                 return (
                   <Flexbox flexDirection="column">
-                    <Team competitors={team.competitors} name={team.name} />
+                    <Team
+                      competitors={team.competitors}
+                      name={team.name + ': ' + team.totalSteps}
+                    />
                   </Flexbox>
                 );
               })}
