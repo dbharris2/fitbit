@@ -28,7 +28,7 @@ app.get('/', (req, res) => {
 app.get('/competition', async (req, res) => {
   const competition: Object = await fitbitClientManager.getCompetition(
     'activities/steps',
-    '2017-04-01',
+    '2017-04-20',
     getYesterdayString(),
   );
   res.json(competition);
