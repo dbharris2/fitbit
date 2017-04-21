@@ -17,9 +17,8 @@ function getTeamOneCompetitors(
   return competitors.filter((competitor: FitbitCompetitor) => {
     return competitor.profile.user.encodedId === '256YMG' ||
       competitor.profile.user.encodedId === '2WMQDP' ||
-      competitor.profile.user.encodedId === '2Z8TC2' ||
-      competitor.profile.user.encodedId === '33694V' ||
-      competitor.profile.user.encodedId === '5MSHQS';
+      competitor.profile.user.encodedId === '2XCGBN' ||
+      competitor.profile.user.encodedId === '4BPPZQ';
   });
 }
 
@@ -27,11 +26,10 @@ function getTeamTwoCompetitors(
   competitors: Array<FitbitCompetitor>,
 ): Array<FitbitCompetitor> {
   return competitors.filter((competitor: FitbitCompetitor) => {
-    return competitor.profile.user.encodedId === '2XCGBN' ||
-      competitor.profile.user.encodedId === '4C7CC5' ||
+    return competitor.profile.user.encodedId === '4C7CC5' ||
       competitor.profile.user.encodedId === '2WRBR6' ||
       competitor.profile.user.encodedId === '3C3F9G' ||
-      competitor.profile.user.encodedId === '4BPPZQ';
+      competitor.profile.user.encodedId === '5MSHQS';
   });
 }
 
