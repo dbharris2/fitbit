@@ -39,7 +39,8 @@ function getTotalStepsForCompetitors(
   var totalSteps: number = 0;
   competitors.forEach((competitor: FitbitCompetitor, index: number) => {
     competitor.activityTimeSeries.forEach((steps: Array<String>) => {
-      totalSteps = parseInt(steps[1]) + totalSteps;
+      const stepCount: String = steps[1];
+      totalSteps += parseInt(stepCount);
     });
   });
   return new String(totalSteps);
@@ -49,29 +50,33 @@ function getTotalActivityTimeSeriesForCompetitors(
   competitors: Array<FitbitCompetitor>,
 ): Array<Array<String>> {
   const dates: Array<String> = [];
-  const totalSteps: Object = {};
+  const totalActivityTimeSeries: Object = {};
 
   competitors.forEach((competitor: FitbitCompetitor, index: number) => {
+    var competitorTotalSteps: number = 0;
     competitor.activityTimeSeries.forEach((steps: Array<String>) => {
       const date: String = steps[0];
       dates.push(date);
 
-      if (totalSteps[date] == null) {
-        totalSteps[date] = '0';
+      if (totalActivityTimeSeries[date] == null) {
+        totalActivityTimeSeries[date] = '0';
       }
 
       const stepCount: String = steps[1];
-      totalSteps[date] = new String(
-        parseInt(totalSteps[date]) + parseInt(stepCount),
+      competitorTotalSteps += parseInt(stepCount);
+
+      totalActivityTimeSeries[date] = new String(
+        parseInt(totalActivityTimeSeries[date]) +
+          parseInt(competitorTotalSteps),
       );
     });
   });
 
-  const timeSeries: Array<Array<String>> = [];
+  const formattedActivityTimeSeries: Array<Array<String>> = [];
   dates.forEach((date: String) => {
-    timeSeries.push([date, totalSteps[date]]);
+    formattedActivityTimeSeries.push([date, totalActivityTimeSeries[date]]);
   });
-  return timeSeries;
+  return formattedActivityTimeSeries;
 }
 
 /**
