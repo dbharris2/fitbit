@@ -44,22 +44,6 @@ function renderCompetitors(
   return competitors == null ? null : _renderCompetitors(competitors);
 }
 
-function _formatCompetitorsActivityTimeSeriesData(
-  competitors: Array<FitbitCompetitor>,
-): Array<Object> {
-  return competitors.map((competitor: FitbitCompetitor) => {
-    return competitor.totalActivityTimeSeries;
-  });
-}
-
-function formatCompetitorsActivityTimeSeriesData(
-  competitors: ?Array<FitbitCompetitor>,
-): ?Array<Object> {
-  return competitors == null
-    ? null
-    : _formatCompetitorsActivityTimeSeriesData(competitors);
-}
-
 function _updateSelectedCompetitors(
   competitors: Array<FitbitCompetitor>,
   selectedCompetitors: Array<FitbitCompetitor>,
@@ -162,7 +146,6 @@ export default class FitbitContainer extends React.Component {
             marginBottom: '30px',
           }}
         >
-
           {this.state.teams == null
             ? null
             : this.state.teams.map((team: FitbitTeam) => {
@@ -178,12 +161,27 @@ export default class FitbitContainer extends React.Component {
         </Flexbox>
 
         <Flexbox alignItems="center" flexDirection="column">
+          <h2>Team - Total Steps/Day</h2>
+          {this.state.teams == null
+            ? null
+            : <LineChart
+                data={this.state.teams.map((team: FitbitTeam) => {
+                  return team.activityTimeSeries;
+                })}
+                xtitle={'Date'}
+                ytitle={'Steps'}
+              />}
+        </Flexbox>
+
+        <Flexbox alignItems="center" flexDirection="column">
           <h2>Total Steps/Day</h2>
           {this.state.selectedTotalActivityTimeSeriesCompetitors == null
             ? null
             : <LineChart
-                data={formatCompetitorsActivityTimeSeriesData(
-                  this.state.selectedTotalActivityTimeSeriesCompetitors,
+                data={this.state.selectedTotalActivityTimeSeriesCompetitors.map(
+                  (competitor: FitbitCompetitor) => {
+                    return competitor.totalActivityTimeSeries;
+                  },
                 )}
                 xtitle={'Date'}
                 ytitle={'Steps'}
