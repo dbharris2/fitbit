@@ -45,6 +45,35 @@ function getTotalStepsForCompetitors(
   return new String(totalSteps);
 }
 
+function getTotalActivityTimeSeriesForCompetitors(
+  competitors: Array<FitbitCompetitor>,
+): Array<Array<String>> {
+  const dates: Array<String> = [];
+  const totalSteps: Object = {};
+
+  competitors.forEach((competitor: FitbitCompetitor, index: number) => {
+    competitor.activityTimeSeries.forEach((steps: Array<String>) => {
+      const date: String = steps[0];
+      dates.push(date);
+
+      if (totalSteps[date] == null) {
+        totalSteps[date] = '0';
+      }
+
+      const stepCount: String = steps[1];
+      totalSteps[date] = new String(
+        parseInt(totalSteps[date]) + parseInt(stepCount),
+      );
+    });
+  });
+
+  const timeSeries: Array<Array<String>> = [];
+  dates.forEach((date: String) => {
+    timeSeries.push([date, totalSteps[date]]);
+  });
+  return timeSeries;
+}
+
 /**
  * Fetches data from each Fitbit client
  */
@@ -137,11 +166,19 @@ export default class FitbitClientManager {
           name: 'Team One',
           competitors: teamOneCompetitors,
           totalSteps: getTotalStepsForCompetitors(teamOneCompetitors),
+          activityTimeSeries: {
+            name: 'Team One',
+            data: getTotalActivityTimeSeriesForCompetitors(teamOneCompetitors),
+          },
         },
         {
           name: 'Team Two',
           competitors: teamTwoCompetitors,
           totalSteps: getTotalStepsForCompetitors(teamTwoCompetitors),
+          activityTimeSeries: {
+            name: 'Team Two',
+            data: getTotalActivityTimeSeriesForCompetitors(teamTwoCompetitors),
+          },
         },
       ],
     };
