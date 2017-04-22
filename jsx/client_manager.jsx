@@ -228,7 +228,7 @@ export default class FitbitClientManager {
         refresh_token: client.accessTokenInfo.getRefreshToken(),
         user_id: client.accessTokenInfo.getUserId(),
       }, (err, doc) => {
-        if (err) throw err;
+        if (err) return null;
         this.clients.push(client);
       });
     }
