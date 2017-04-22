@@ -168,20 +168,20 @@ export default class FitbitClientManager {
       competitors: competitors,
       teams: [
         {
-          name: 'Team One',
+          name: 'Sole Survivors',
           competitors: teamOneCompetitors,
           totalSteps: getTotalStepsForCompetitors(teamOneCompetitors),
           activityTimeSeries: {
-            name: 'Team One',
+            name: 'Sole Survivors',
             data: getTotalActivityTimeSeriesForCompetitors(teamOneCompetitors),
           },
         },
         {
-          name: 'Team Two',
+          name: 'The Unamazing Racers',
           competitors: teamTwoCompetitors,
           totalSteps: getTotalStepsForCompetitors(teamTwoCompetitors),
           activityTimeSeries: {
-            name: 'Team Two',
+            name: 'The Unamazing Racers',
             data: getTotalActivityTimeSeriesForCompetitors(teamTwoCompetitors),
           },
         },
