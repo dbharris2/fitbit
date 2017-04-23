@@ -16,7 +16,9 @@ export default function Header(
       justifyContent="space-between"
       style={props.style}
     >
-      <h1 style={{color: '#333333'}}>Fitbit Pie Challenge</h1>
+      <h1 style={{color: '#333333', fontFamily: 'Lucida Grande'}}>
+        Fitbit Pie Challenge
+      </h1>
     </Flexbox>
   );
 }

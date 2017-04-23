@@ -126,6 +126,7 @@ export default class FitbitContainer extends React.Component {
         flexDirection="column"
         style={{
           overflow: 'hidden',
+          fontFamily: 'Lucida Grande',
         }}
       >
         <Header
@@ -153,7 +154,9 @@ export default class FitbitContainer extends React.Component {
                   <Flexbox flexDirection="column">
                     <Team
                       competitors={team.competitors}
-                      name={team.name + ': ' + team.totalSteps}
+                      name={team.name}
+                      stepCount={team.totalSteps}
+                      isWinning={team.isWinning}
                     />
                   </Flexbox>
                 );
