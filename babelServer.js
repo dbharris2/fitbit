@@ -26,6 +26,11 @@ app.get('/', (req, res) => {
   res.sendFile(path.resolve(__dirname + './public/index.html'));
 });
 
+app.get('/cached-competition', async (req, res) => {
+  const competition: ?Object = await fitbitClientManager.getCachedCompetition();
+  res.json(competition);
+});
+
 app.get('/competition', async (req, res) => {
   const competition: Object = await fitbitClientManager.getCompetition(
     'activities/steps',
