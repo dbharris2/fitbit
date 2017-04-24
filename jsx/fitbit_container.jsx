@@ -108,14 +108,28 @@ export default class FitbitContainer extends React.Component {
   }
 
   componentDidMount(): void {
+    axios.get('/cached-competition').then(response => {
+      if (response != null && response.data !== '') {
+        const competition: FitbitCompetition = response.data;
+        this.setState({
+          competitors: competition.competitors,
+          selectedDailyActivityTimeSeriesCompetitors: competition.competitors,
+          selectedTotalActivityTimeSeriesCompetitors: competition.competitors,
+          teams: competition.teams,
+        });
+      }
+    });
+
     axios.get('/competition').then(response => {
-      const competition: FitbitCompetition = response.data;
-      this.setState({
-        competitors: competition.competitors,
-        selectedDailyActivityTimeSeriesCompetitors: competition.competitors,
-        selectedTotalActivityTimeSeriesCompetitors: competition.competitors,
-        teams: competition.teams,
-      });
+      if (response != null && response.data !== '') {
+        const competition: FitbitCompetition = response.data;
+        this.setState({
+          competitors: competition.competitors,
+          selectedDailyActivityTimeSeriesCompetitors: competition.competitors,
+          selectedTotalActivityTimeSeriesCompetitors: competition.competitors,
+          teams: competition.teams,
+        });
+      }
     });
   }
 

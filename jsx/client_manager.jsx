@@ -83,6 +83,7 @@ function getTotalActivityTimeSeriesForCompetitors(
  * Fetches data from each Fitbit client
  */
 export default class FitbitClientManager {
+  cachedCompetition: ?Object;
   clients: Array<FitbitClient>;
   database: ?Object;
 
@@ -146,6 +147,10 @@ export default class FitbitClientManager {
     return await Promise.all(competitorPromises);
   }
 
+  getCachedCompetition(): ?Object {
+    return this.cachedCompetition;
+  }
+
   async getCompetition(
     resourcePath: string,
     baseDate: string,
@@ -171,7 +176,7 @@ export default class FitbitClientManager {
       teamTwoCompetitors,
     );
 
-    return {
+    const competition: Object = {
       competitors: competitors,
       teams: [
         {
@@ -196,6 +201,9 @@ export default class FitbitClientManager {
         },
       ],
     };
+
+    this.cachedCompetition = competition;
+    return competition;
   }
 
   setDatabase(database: Object) {
