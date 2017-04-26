@@ -4,7 +4,6 @@ import assert from 'assert';
 
 import AccessTokenInfo from './access_token_info';
 import FitbitApiClient from 'fitbit-node';
-import FitbitApp from './app';
 import FitbitClientManager from './client_manager';
 
 /**
@@ -15,11 +14,12 @@ export default class FitbitClient {
   client: FitbitApiClient;
   clientManager: FitbitClientManager;
 
-  constructor(fitbitApp: FitbitApp, fitbitClientManager: FitbitClientManager) {
-    this.client = new FitbitApiClient(
-      fitbitApp.getClientId(),
-      fitbitApp.getClientSecret(),
-    );
+  constructor(
+    clientId: String,
+    clientSecret: String,
+    fitbitClientManager: FitbitClientManager,
+  ) {
+    this.client = new FitbitApiClient(clientId, clientSecret);
     this.clientManager = fitbitClientManager;
   }
 
@@ -35,7 +35,7 @@ export default class FitbitClient {
    * See {@link https://dev.fitbit.com/docs/oauth2/#access-token-request Fitbit Access Token Request}
    * for more information
    */
-  async setAccessToken(code: string, callbackUrl: string): Promise<void> {
+  async setAccessToken(code: string, callbackUrl: String): Promise<void> {
     assert(code != null);
     assert(callbackUrl != null);
     const accessTokenInfo: Object = await this.client.getAccessToken(
@@ -109,7 +109,7 @@ export default class FitbitClient {
    * See {@link https://dev.fitbit.com/docs/oauth2/ Fitbit Authorization Documentation}
    * for more information
    */
-  getAuthorizeUrl(callbackUrl: string): string {
+  getAuthorizeUrl(callbackUrl: String): String {
     assert(callbackUrl != null);
     return this.client.getAuthorizeUrl(
       'activity heartrate location profile settings sleep social',
