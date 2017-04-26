@@ -6,8 +6,6 @@ import mongodb from 'mongodb';
 import path from 'path';
 
 import AccessTokenInfo from './access_token_info';
-import AppLoader from './app_loader';
-import FitbitApp from './app';
 import FitbitClient from './client';
 import type {FitbitCompetitor} from './fitbit_competitor';
 
@@ -84,10 +82,14 @@ function getTotalActivityTimeSeriesForCompetitors(
  */
 export default class FitbitClientManager {
   cachedCompetition: ?Object;
+  clientId: String;
+  clientSecret: String;
   clients: Array<FitbitClient>;
   database: ?Object;
 
-  constructor() {
+  constructor(clientId: String, clientSecret: String) {
+    this.clientId = clientId;
+    this.clientSecret = clientSecret;
     this.clients = [];
     this.database = null;
   }
@@ -122,10 +124,9 @@ export default class FitbitClientManager {
           if (err) {
             console.log(err);
           } else {
-            const clients: Array<FitbitClient> = await this._transformJsonObjectsToFitbitClients(
+            const clients: Array<FitbitClient> = this._transformJsonObjectsToFitbitClients(
               docs,
             );
-
             clients.forEach((client: FitbitClient) => {
               this.clients.push(client);
             });
@@ -260,12 +261,15 @@ export default class FitbitClientManager {
     return null;
   }
 
-  async _transformJsonObjectsToFitbitClients(
+  _transformJsonObjectsToFitbitClients(
     jsonObjects: Array<Object>,
-  ): Promise<Array<FitbitClient>> {
-    const fitbitApp: FitbitApp = await AppLoader.loadAppData();
+  ): Array<FitbitClient> {
     return jsonObjects.map((client: Object) => {
-      const fitbitClient: FitbitClient = new FitbitClient(fitbitApp, this);
+      const fitbitClient: FitbitClient = new FitbitClient(
+        this.clientId,
+        this.clientSecret,
+        this,
+      );
       fitbitClient._setAccessTokenInfo(client);
       return fitbitClient;
     });
