@@ -15,6 +15,7 @@ export type FitbitCompetitor = {
   profile: Profile,
   totalActivityTimeSeries: Object,
   totalSteps: string,
+  yesterdaysSteps: string,
 };
 
 export type FitbitTeam = {
