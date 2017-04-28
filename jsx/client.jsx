@@ -102,6 +102,9 @@ export default class FitbitClient {
         data: totalActivityTimeSeriesUserData,
       },
       totalSteps: totalSteps.toString(),
+      yesterdaysSteps: formattedActivityTimeSeries[
+        formattedActivityTimeSeries.length - 1
+      ][1],
     };
   }
 

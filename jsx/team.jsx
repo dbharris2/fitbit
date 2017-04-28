@@ -24,7 +24,14 @@ function competitors(competitors: Array<FitbitCompetitor>) {
           />
         }
         primaryText={<h3>{competitor.profile.user.displayName}</h3>}
-        secondaryText={<h5>{'Total steps: ' + competitor.totalSteps}</h5>}
+        secondaryText={
+          <h5>
+            {'Total steps: ' + competitor.totalSteps}
+            <br />
+            {"Yesterday's steps: " + competitor.yesterdaysSteps}
+          </h5>
+        }
+        secondaryTextLines={2}
       />
     );
   });
