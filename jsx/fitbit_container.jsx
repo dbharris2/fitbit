@@ -95,6 +95,7 @@ export default class FitbitContainer extends React.Component {
     selectedDailyActivityTimeSeriesCompetitors: ?Array<FitbitCompetitor>,
     selectedTotalActivityTimeSeriesCompetitors: ?Array<FitbitCompetitor>,
     teams: ?Array<FitbitTeam>,
+    differenceActivityTimeSeries: ?Object,
   };
 
   constructor(props: FitbitContainerProps): void {
@@ -104,6 +105,7 @@ export default class FitbitContainer extends React.Component {
       selectedDailyActivityTimeSeriesCompetitors: null,
       selectedTotalActivityTimeSeriesCompetitors: null,
       teams: null,
+      differenceActivityTimeSeries: null,
     };
   }
 
@@ -116,6 +118,7 @@ export default class FitbitContainer extends React.Component {
           selectedDailyActivityTimeSeriesCompetitors: competition.competitors,
           selectedTotalActivityTimeSeriesCompetitors: competition.competitors,
           teams: competition.teams,
+          differenceActivityTimeSeries: competition.differenceActivityTimeSeries,
         });
       }
     });
@@ -128,6 +131,7 @@ export default class FitbitContainer extends React.Component {
           selectedDailyActivityTimeSeriesCompetitors: competition.competitors,
           selectedTotalActivityTimeSeriesCompetitors: competition.competitors,
           teams: competition.teams,
+          differenceActivityTimeSeries: competition.differenceActivityTimeSeries,
         });
       }
     });
@@ -258,6 +262,17 @@ export default class FitbitContainer extends React.Component {
               }}
               style={null}
             />}
+
+        {this.state.differenceActivityTimeSeries == null
+          ? null
+          : <Flexbox alignItems="center" flexDirection="column">
+              <h2>Difference in Team Steps/Day</h2>
+              <LineChart
+                data={this.state.differenceActivityTimeSeries}
+                xtitle={'Date'}
+                ytitle={'Difference in Steps'}
+              />
+            </Flexbox>}
       </Flexbox>
     );
   }

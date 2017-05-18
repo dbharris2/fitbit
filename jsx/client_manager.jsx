@@ -44,6 +44,22 @@ function getTotalStepsForCompetitors(
   return totalSteps;
 }
 
+function findDifferenceTimeSeries(
+  seriesOne: Array<Array<String>>,
+  seriesTwo: Array<Array<String>>,
+): Array<Array<String>> {
+  const differenceActivityTimeSeries: Array<Array<String>> = [];
+  for (var i = 0; i < seriesOne.length; i++) {
+    const item1 = seriesOne[i];
+    const item2 = seriesTwo[i];
+    differenceActivityTimeSeries.push([
+      item1[0],
+      new String(parseInt(item1[1]) - parseInt(item2[1])),
+    ]);
+  }
+  return differenceActivityTimeSeries;
+}
+
 function getTotalActivityTimeSeriesForCompetitors(
   competitors: Array<FitbitCompetitor>,
 ): Array<Array<String>> {
@@ -177,7 +193,18 @@ export default class FitbitClientManager {
       teamTwoCompetitors,
     );
 
+    const teamOneActivity = getTotalActivityTimeSeriesForCompetitors(
+      teamOneCompetitors,
+    );
+    const teamTwoActivity = getTotalActivityTimeSeriesForCompetitors(
+      teamTwoCompetitors,
+    );
+
     const competition: Object = {
+      differenceActivityTimeSeries: findDifferenceTimeSeries(
+        teamOneActivity,
+        teamTwoActivity,
+      ),
       competitors: competitors,
       teams: [
         {
@@ -187,7 +214,7 @@ export default class FitbitClientManager {
           totalSteps: teamOneTotalSteps,
           activityTimeSeries: {
             name: 'Sole Survivors',
-            data: getTotalActivityTimeSeriesForCompetitors(teamOneCompetitors),
+            data: teamOneActivity,
           },
         },
         {
@@ -197,7 +224,7 @@ export default class FitbitClientManager {
           totalSteps: teamTwoTotalSteps,
           activityTimeSeries: {
             name: 'The Unamazing Racers',
-            data: getTotalActivityTimeSeriesForCompetitors(teamTwoCompetitors),
+            data: teamTwoActivity,
           },
         },
       ],
