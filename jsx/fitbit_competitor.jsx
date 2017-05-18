@@ -29,4 +29,5 @@ export type FitbitTeam = {
 export type FitbitCompetition = {
   competitors: Array<FitbitCompetitor>,
   teams: Array<FitbitTeam>,
+  differenceActivityTimeSeries: Object,
 };
